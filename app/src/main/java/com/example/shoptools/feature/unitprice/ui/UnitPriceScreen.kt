@@ -77,7 +77,6 @@ fun UnitPriceScreen(viewModel: UnitPriceViewModel) {
                 row = row,
                 onUpdate = { viewModel.onEvent(UnitPriceEvent.UpdateRow(it)) },
                 onRemove = { viewModel.onEvent(UnitPriceEvent.RemoveRow(row.id)) },
-                onClear = { viewModel.onEvent(UnitPriceEvent.ClearRow(row.id)) },
                 canRemove = state.rows.size > 1,
             )
         }
@@ -110,7 +109,6 @@ private fun ProductRowEditor(
     row: ProductRow,
     onUpdate: (ProductRow) -> Unit,
     onRemove: () -> Unit,
-    onClear: () -> Unit,
     canRemove: Boolean,
 ) {
     Card(
@@ -121,13 +119,15 @@ private fun ProductRowEditor(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 OutlinedTextField(
                     value = row.name,
-                    onValueChange = { onUpdate(row.copy(name = it.replace("\n", ""))) },
+                    onValueChange = { onUpdate(row.copy(name = it)) },
                     label = { Text(stringResource(R.string.hint_product_name)) },
                     modifier = Modifier.weight(1f),
-                    maxLines = 1,
+                    singleLine = true,
                 )
-                IconButton(onClick = if (canRemove) onRemove else onClear) {
-                    Icon(Icons.Default.Delete, contentDescription = if (canRemove) "削除" else "クリア")
+                if (canRemove) {
+                    IconButton(onClick = onRemove) {
+                        Icon(Icons.Default.Delete, contentDescription = "削除")
+                    }
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -157,10 +157,10 @@ private fun ProductRowEditor(
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = row.unit,
-                    onValueChange = { onUpdate(row.copy(unit = it.replace("\n", ""))) },
+                    onValueChange = { onUpdate(row.copy(unit = it)) },
                     label = { Text(stringResource(R.string.hint_unit)) },
                     modifier = Modifier.weight(1f),
-                    maxLines = 1,
+                    singleLine = true,
                 )
                 Column(modifier = Modifier.weight(1f)) {
                     OutlinedTextField(

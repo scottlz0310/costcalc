@@ -47,7 +47,6 @@ sealed class UnitPriceEvent {
     object AddRow : UnitPriceEvent()
     data class UpdateRow(val row: ProductRow) : UnitPriceEvent()
     data class RemoveRow(val id: String) : UnitPriceEvent()
-    data class ClearRow(val id: String) : UnitPriceEvent()
 }
 
 @HiltViewModel
@@ -71,7 +70,6 @@ class UnitPriceViewModel @Inject constructor(
             is UnitPriceEvent.AddRow -> addRow()
             is UnitPriceEvent.UpdateRow -> updateRow(event.row)
             is UnitPriceEvent.RemoveRow -> removeRow(event.id)
-            is UnitPriceEvent.ClearRow -> clearRow(event.id)
         }
     }
 
@@ -93,15 +91,6 @@ class UnitPriceViewModel @Inject constructor(
     private fun removeRow(id: String) {
         _uiState.update { state ->
             state.copy(rows = state.rows.filter { it.id != id })
-        }
-        recalculate()
-    }
-
-    private fun clearRow(id: String) {
-        _uiState.update { state ->
-            state.copy(rows = state.rows.map { row ->
-                if (row.id != id) row else ProductRow(id = row.id)
-            })
         }
         recalculate()
     }
