@@ -108,6 +108,7 @@ fun StampsScreen(viewModel: StampsViewModel) {
                 onDenomChange = { viewModel.onEvent(StampsEvent.UpdateDenomination(row.id, it)) },
                 onStockChange = { viewModel.onEvent(StampsEvent.UpdateStock(row.id, it)) },
                 onRemove = { viewModel.onEvent(StampsEvent.RemoveRow(row.id)) },
+                onClear = { viewModel.onEvent(StampsEvent.ClearRow(row.id)) },
                 canRemove = state.rows.size > 1,
             )
         }
@@ -160,6 +161,7 @@ private fun StampRowEditor(
     onDenomChange: (String) -> Unit,
     onStockChange: (String) -> Unit,
     onRemove: () -> Unit,
+    onClear: () -> Unit,
     canRemove: Boolean,
 ) {
     Card(
@@ -193,10 +195,11 @@ private fun StampRowEditor(
                 )
                 if (row.stockError.isNotBlank()) ErrorText(row.stockError)
             }
-            if (canRemove) {
-                IconButton(onClick = onRemove, modifier = Modifier.padding(top = 4.dp)) {
-                    Icon(Icons.Default.Delete, contentDescription = "削除")
-                }
+            IconButton(
+                onClick = if (canRemove) onRemove else onClear,
+                modifier = Modifier.padding(top = 4.dp),
+            ) {
+                Icon(Icons.Default.Delete, contentDescription = if (canRemove) "削除" else "クリア")
             }
         }
     }
