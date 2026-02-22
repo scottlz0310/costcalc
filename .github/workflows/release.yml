@@ -1,0 +1,59 @@
+name: Android リリースビルド
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ビルド・署名・アップロード
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: コードをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: JDK 17 をセットアップ
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Gradle キャッシュを設定
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts', '**/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: keystore ファイルを復元
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > ${{ runner.temp }}/release.keystore
+
+      - name: keystore.properties を生成
+        run: |
+          cat > keystore.properties <<EOF
+          storeFile=${{ runner.temp }}/release.keystore
+          storePassword=${{ secrets.ANDROID_SIGNING_STORE_PASSWORD }}
+          keyAlias=${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}
+          keyPassword=${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}
+          EOF
+
+      - name: gradlew に実行権限を付与
+        run: chmod +x ./gradlew
+
+      - name: リリース APK をビルド
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: APK をアーティファクトとしてアップロード
+        uses: actions/upload-artifact@v4
+        with:
+          name: shoptools-release-${{ github.run_number }}
+          path: app/build/outputs/apk/release/app-release.apk
+          retention-days: 30

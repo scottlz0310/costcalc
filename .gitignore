@@ -45,3 +45,6 @@ proguard/
 
 # Test output
 test-results/
+
+# 署名設定（パスワードを含むため git 管理外）
+keystore.properties

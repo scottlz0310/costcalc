@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,6 +10,20 @@ plugins {
 android {
     namespace = "com.example.shoptools"
     compileSdk = 35
+
+    val keystoreProps = Properties().also { props ->
+        val propsFile = rootProject.file("keystore.properties")
+        if (propsFile.exists()) props.load(propsFile.reader(Charsets.UTF_8))
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file(keystoreProps["storeFile"] as String)
+            storePassword = keystoreProps["storePassword"] as String
+            keyAlias = keystoreProps["keyAlias"] as String
+            keyPassword = keystoreProps["keyPassword"] as String
+        }
+    }
 
     defaultConfig {
         applicationId = "com.example.shoptools"
@@ -22,6 +38,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -72,6 +89,9 @@ dependencies {
 
     // DataStore
     implementation(libs.datastore.preferences)
+
+    // Material Components (テーマベースライン)
+    implementation(libs.material)
 
     // Tests
     testImplementation(libs.junit)
