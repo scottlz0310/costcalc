@@ -46,17 +46,25 @@ object BoundedSubsetSum {
         val dpMax = target + maxOf(maxDenom * 2, 100)
 
         // dp[amount] = reachability + traceback配列
+        // 各金額に到達する最小枚数も追跡し、より少ない枚数のパスが見つかれば更新する
         val reachable = BooleanArray(dpMax + 1) { false }
         reachable[0] = true
         val from = Array(dpMax + 1) { -1 }  // -1 = no item used
         val itemUsed = Array(dpMax + 1) { -1 } // which item index was last used
+        val piecesForAmount = IntArray(dpMax + 1) { dpMax + 1 }
+        piecesForAmount[0] = 0
 
         for ((idx, item) in items.withIndex()) {
             // 0/1 DP: 降順で処理
             for (j in dpMax downTo item.denomination) {
-                if (reachable[j - item.denomination] && !reachable[j]) {
+                val prev = j - item.denomination
+                if (!reachable[prev]) continue
+                val candidatePieces = piecesForAmount[prev] + item.multiplier
+                // 未到達か、より少ない枚数で到達できる場合に更新する
+                if (!reachable[j] || candidatePieces < piecesForAmount[j]) {
                     reachable[j] = true
-                    from[j] = j - item.denomination
+                    piecesForAmount[j] = candidatePieces
+                    from[j] = prev
                     itemUsed[j] = idx
                 }
             }

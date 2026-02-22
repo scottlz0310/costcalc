@@ -4,9 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -25,10 +30,10 @@ import com.example.shoptools.feature.unitprice.UnitPriceViewModel
 import com.example.shoptools.feature.unitprice.ui.UnitPriceScreen
 import dagger.hilt.android.AndroidEntryPoint
 
-sealed class Screen(val route: String, val labelRes: Int) {
-    object UnitPrice : Screen("unit_price", R.string.tab_unit_price)
-    object Stamps : Screen("stamps", R.string.tab_stamps)
-    object Settings : Screen("settings", R.string.tab_settings)
+sealed class Screen(val route: String, val labelRes: Int, val icon: ImageVector) {
+    object UnitPrice : Screen("unit_price", R.string.tab_unit_price, Icons.Filled.ShoppingCart)
+    object Stamps : Screen("stamps", R.string.tab_stamps, Icons.Filled.Email)
+    object Settings : Screen("settings", R.string.tab_settings, Icons.Filled.Settings)
 }
 
 private val bottomNavItems = listOf(Screen.UnitPrice, Screen.Stamps, Screen.Settings)
@@ -59,12 +64,9 @@ private fun MainScaffold() {
                 bottomNavItems.forEach { screen ->
                     NavigationBarItem(
                         icon = {
-                            Text(
-                                text = when (screen) {
-                                    Screen.UnitPrice -> "🛒"
-                                    Screen.Stamps -> "✉"
-                                    Screen.Settings -> "⚙"
-                                }
+                            Icon(
+                                imageVector = screen.icon,
+                                contentDescription = stringResource(screen.labelRes),
                             )
                         },
                         label = { Text(stringResource(screen.labelRes)) },

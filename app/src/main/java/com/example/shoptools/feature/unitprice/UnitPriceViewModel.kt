@@ -113,7 +113,7 @@ class UnitPriceViewModel @Inject constructor(
         val results = rows.mapNotNull { row ->
             val price = row.price.toDoubleOrNull() ?: return@mapNotNull null
             val quantity = row.quantity.toDoubleOrNull() ?: return@mapNotNull null
-            val count = row.count.toIntOrNull() ?: 1
+            val count = row.count.toIntOrNull() ?: return@mapNotNull null
             if (price <= 0 || quantity <= 0 || count < 1) return@mapNotNull null
             val unitPrice = UnitPriceCalculator.calculate(price, quantity, count)
             UnitPriceResult(
