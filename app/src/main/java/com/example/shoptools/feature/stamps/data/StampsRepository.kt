@@ -33,14 +33,9 @@ class StampsRepository @Inject constructor(
         )
     }
 
-    suspend fun saveRows(rows: List<Pair<String, String>>) {
+    suspend fun saveState(rows: List<Pair<String, String>>, target: String) {
         context.stampsDataStore.edit { prefs ->
             prefs[ROWS_KEY] = encodeRows(rows)
-        }
-    }
-
-    suspend fun saveTarget(target: String) {
-        context.stampsDataStore.edit { prefs ->
             prefs[TARGET_KEY] = target
         }
     }
@@ -51,7 +46,7 @@ class StampsRepository @Inject constructor(
     private fun decodeRows(encoded: String): List<Pair<String, String>> {
         if (encoded.isBlank()) return emptyList()
         return encoded.split("|").mapNotNull { pair ->
-            val parts = pair.split(":")
+            val parts = pair.split(":", limit = 2)
             if (parts.size == 2) parts[0] to parts[1] else null
         }
     }

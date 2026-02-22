@@ -72,13 +72,22 @@ class StampsViewModel @Inject constructor(
             val saved = stampsRepository.stampsFlow.first()
             if (saved.rows.isNotEmpty()) {
                 _uiState.update { state ->
-                    state.copy(
-                        rows = saved.rows.map { (denom, stock) ->
-                            StampInventoryRow(denomination = denom, stock = stock)
-                        },
-                        target = saved.target,
-                    )
+                    val hasUserInput = state.target.isNotBlank() ||
+                        state.rows.any { row -> row.denomination.isNotBlank() || row.stock.isNotBlank() }
+                    if (hasUserInput) {
+                        state
+                    } else {
+                        state.copy(
+                            rows = saved.rows.map { (denom, stock) ->
+                                StampInventoryRow(denomination = denom, stock = stock)
+                            },
+                            target = saved.target,
+                        )
+                    }
                 }
+            } else {
+                // 初回起動時は初期状態を保存して次回起動時も一貫した行数を保証
+                saveState()
             }
         }
     }
@@ -97,7 +106,7 @@ class StampsViewModel @Inject constructor(
 
     private fun addRow() {
         _uiState.update { it.copy(rows = it.rows + StampInventoryRow()) }
-        saveRows()
+        saveState()
     }
 
     private fun updateDenomination(id: String, value: String) {
@@ -114,7 +123,7 @@ class StampsViewModel @Inject constructor(
                 hasResult = false,
             )
         }
-        saveRows()
+        saveState()
     }
 
     private fun updateStock(id: String, value: String) {
@@ -131,36 +140,36 @@ class StampsViewModel @Inject constructor(
                 hasResult = false,
             )
         }
-        saveRows()
+        saveState()
     }
 
     private fun removeRow(id: String) {
         _uiState.update { s -> s.copy(rows = s.rows.filter { it.id != id }) }
-        saveRows()
+        saveState()
     }
 
     private fun clearRow(id: String) {
         _uiState.update { state ->
             state.copy(
                 rows = state.rows.map { row ->
-                    if (row.id != id) row
-                    else row.copy(denomination = "", stock = "", denominationError = "", stockError = "")
+                    if (row.id != id) row else StampInventoryRow(id = row.id)
                 },
                 hasResult = false,
             )
         }
-        saveRows()
+        saveState()
     }
 
     private fun updateTarget(value: String) {
         _uiState.update { it.copy(target = value, targetError = "", hasResult = false) }
-        viewModelScope.launch { stampsRepository.saveTarget(value) }
+        saveState()
     }
 
-    private fun saveRows() {
+    private fun saveState() {
         viewModelScope.launch {
-            val rows = _uiState.value.rows.map { it.denomination to it.stock }
-            stampsRepository.saveRows(rows)
+            val state = _uiState.value
+            val rows = state.rows.map { it.denomination to it.stock }
+            stampsRepository.saveState(rows, state.target)
         }
     }
 
