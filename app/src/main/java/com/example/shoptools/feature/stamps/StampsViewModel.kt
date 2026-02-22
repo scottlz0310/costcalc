@@ -1,7 +1,9 @@
 package com.example.shoptools.feature.stamps
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.shoptools.core.*
+import com.example.shoptools.feature.settings.data.SettingsRepository
 import com.example.shoptools.feature.stamps.domain.BoundedSubsetSum
 import com.example.shoptools.feature.stamps.domain.StampCombination
 import com.example.shoptools.feature.stamps.domain.StampItem
@@ -9,6 +11,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import java.util.UUID
 import javax.inject.Inject
@@ -29,6 +33,7 @@ data class StampsUiState(
     val under: List<StampCombination> = emptyList(),
     val over: List<StampCombination> = emptyList(),
     val hasResult: Boolean = false,
+    val useDigitSeparator: Boolean = false,
 )
 
 sealed class StampsEvent {
@@ -41,12 +46,22 @@ sealed class StampsEvent {
 }
 
 @HiltViewModel
-class StampsViewModel @Inject constructor() : ViewModel() {
+class StampsViewModel @Inject constructor(
+    settingsRepository: SettingsRepository,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         StampsUiState(rows = listOf(StampInventoryRow(), StampInventoryRow()))
     )
     val uiState: StateFlow<StampsUiState> = _uiState.asStateFlow()
+
+    init {
+        settingsRepository.settingsFlow
+            .onEach { settings ->
+                _uiState.update { it.copy(useDigitSeparator = settings.useDigitSeparator) }
+            }
+            .launchIn(viewModelScope)
+    }
 
     fun onEvent(event: StampsEvent) {
         when (event) {

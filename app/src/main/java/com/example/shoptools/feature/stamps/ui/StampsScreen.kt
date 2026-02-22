@@ -53,7 +53,7 @@ fun StampsScreen(viewModel: StampsViewModel) {
                 item {
                     LargeResultCard(
                         title = stringResource(R.string.label_exact),
-                        mainValue = "${formatAmount(state.exact!!.total)}円",
+                        mainValue = "${formatAmount(state.exact!!.total, state.useDigitSeparator)}円",
                         subInfo = "${state.exact!!.pieces}${stringResource(R.string.label_pieces)}  ${BoundedSubsetSum.compositionToString(state.exact!!.composition)}",
                         highlighted = true,
                     )
@@ -68,7 +68,7 @@ fun StampsScreen(viewModel: StampsViewModel) {
                     )
                 }
                 items(state.under) { combo ->
-                    StampResultCard(combo = combo, target = state.target.toIntOrNull() ?: 0)
+                    StampResultCard(combo = combo, target = state.target.toIntOrNull() ?: 0, useDigitSeparator = state.useDigitSeparator)
                 }
             }
             if (state.over.isNotEmpty()) {
@@ -80,7 +80,7 @@ fun StampsScreen(viewModel: StampsViewModel) {
                     )
                 }
                 items(state.over) { combo ->
-                    StampResultCard(combo = combo, target = state.target.toIntOrNull() ?: 0)
+                    StampResultCard(combo = combo, target = state.target.toIntOrNull() ?: 0, useDigitSeparator = state.useDigitSeparator)
                 }
             }
         }
@@ -133,14 +133,14 @@ fun StampsScreen(viewModel: StampsViewModel) {
 }
 
 @Composable
-private fun StampResultCard(combo: StampCombination, target: Int) {
+private fun StampResultCard(combo: StampCombination, target: Int, useDigitSeparator: Boolean = false) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
             Text(
-                text = "${formatAmount(combo.total)}円",
+                text = "${formatAmount(combo.total, useDigitSeparator)}円",
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(

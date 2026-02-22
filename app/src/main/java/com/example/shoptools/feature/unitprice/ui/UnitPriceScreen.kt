@@ -3,6 +3,7 @@ package com.example.shoptools.feature.unitprice.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -52,17 +53,17 @@ fun UnitPriceScreen(viewModel: UnitPriceViewModel) {
             item {
                 LargeResultCard(
                     title = stringResource(R.string.label_cheapest) + (if (cheapest.name.isNotBlank()) "  ${cheapest.name}" else ""),
-                    mainValue = "${formatUnitPrice(cheapest.unitPrice)} ${stringResource(R.string.label_unit_price)}",
+                    mainValue = "${formatUnitPrice(cheapest.unitPrice, state.useDigitSeparator)} ${stringResource(R.string.label_unit_price)}",
                     subInfo = buildSubInfo(cheapest),
                     highlighted = true,
                 )
             }
-            // Other results
+            // Other results (index offset by 1 because cheapest is shown separately above)
             if (state.results.size > 1) {
-                items(state.results.drop(1)) { result ->
+                itemsIndexed(state.results.drop(1)) { index, result ->
                     LargeResultCard(
-                        title = if (result.name.isNotBlank()) result.name else "商品 ${state.results.indexOf(result) + 1}",
-                        mainValue = "${formatUnitPrice(result.unitPrice)} ${stringResource(R.string.label_unit_price)}",
+                        title = if (result.name.isNotBlank()) result.name else "商品 ${index + 2}",
+                        mainValue = "${formatUnitPrice(result.unitPrice, state.useDigitSeparator)} ${stringResource(R.string.label_unit_price)}",
                         subInfo = buildSubInfo(result),
                         highlighted = false,
                     )

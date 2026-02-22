@@ -78,7 +78,7 @@ object BoundedSubsetSum {
         fun makeCombo(amount: Int): StampCombination {
             val comp = reconstruct(amount)
             val pieces = comp.values.sum()
-            return StampCombination(amount, Math.abs(amount - target), pieces, comp)
+            return StampCombination(amount, kotlin.math.abs(amount - target), pieces, comp)
         }
 
         val comparator = compareBy<StampCombination> { it.diff }.thenBy { it.pieces }

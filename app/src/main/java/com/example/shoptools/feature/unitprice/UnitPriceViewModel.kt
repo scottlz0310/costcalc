@@ -1,12 +1,16 @@
 package com.example.shoptools.feature.unitprice
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.shoptools.core.*
+import com.example.shoptools.feature.settings.data.SettingsRepository
 import com.example.shoptools.feature.unitprice.domain.UnitPriceCalculator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import java.util.UUID
 import javax.inject.Inject
@@ -36,6 +40,7 @@ data class UnitPriceResult(
 data class UnitPriceUiState(
     val rows: List<ProductRow> = emptyList(),
     val results: List<UnitPriceResult> = emptyList(),
+    val useDigitSeparator: Boolean = false,
 )
 
 sealed class UnitPriceEvent {
@@ -45,10 +50,20 @@ sealed class UnitPriceEvent {
 }
 
 @HiltViewModel
-class UnitPriceViewModel @Inject constructor() : ViewModel() {
+class UnitPriceViewModel @Inject constructor(
+    settingsRepository: SettingsRepository,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UnitPriceUiState(rows = listOf(ProductRow(), ProductRow())))
     val uiState: StateFlow<UnitPriceUiState> = _uiState.asStateFlow()
+
+    init {
+        settingsRepository.settingsFlow
+            .onEach { settings ->
+                _uiState.update { it.copy(useDigitSeparator = settings.useDigitSeparator) }
+            }
+            .launchIn(viewModelScope)
+    }
 
     fun onEvent(event: UnitPriceEvent) {
         when (event) {
