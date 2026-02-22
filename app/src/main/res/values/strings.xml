@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ShopTools</string>
+    <string name="tab_unit_price">単価比較</string>
+    <string name="tab_stamps">切手</string>
+    <string name="tab_settings">設定</string>
+    <string name="empty_unit_price">商品を追加すると、最もお得なものを大きく表示します</string>
+    <string name="empty_stamps">在庫（額面:枚数）を追加して、目標金額に近い組合せを探します</string>
+    <string name="label_cheapest">最安</string>
+    <string name="label_exact">ぴったり</string>
+    <string name="label_under">ちょっと足りない</string>
+    <string name="label_over">ちょっと超える</string>
+    <string name="hint_product_name">商品名（任意）</string>
+    <string name="hint_price">価格（円）</string>
+    <string name="hint_quantity">内容量</string>
+    <string name="hint_unit">単位（任意）</string>
+    <string name="hint_count">入数</string>
+    <string name="hint_denomination">額面</string>
+    <string name="hint_stock">枚数</string>
+    <string name="hint_target">目標金額（円）</string>
+    <string name="label_unit_price">円 / unit</string>
+    <string name="label_total">合計</string>
+    <string name="label_diff">差分</string>
+    <string name="label_pieces">枚</string>
+    <string name="btn_add">追加</string>
+    <string name="btn_calculate">計算</string>
+    <string name="settings_font_size">フォントサイズ</string>
+    <string name="settings_font_normal">標準</string>
+    <string name="settings_font_large">大</string>
+    <string name="settings_font_xlarge">特大</string>
+    <string name="settings_digit_separator">桁区切り</string>
+</resources>
