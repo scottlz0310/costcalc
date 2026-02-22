@@ -95,7 +95,12 @@ fun UnitPriceScreen(viewModel: UnitPriceViewModel) {
 
 private fun buildSubInfo(result: UnitPriceResult): String {
     val unitStr = if (result.unit.isNotBlank()) result.unit else "unit"
-    return "¥${result.price.toInt()} / ${result.totalQuantity}${unitStr}" +
+    val priceStr = if (result.price == result.price.toLong().toDouble()) {
+        "¥${result.price.toLong()}"
+    } else {
+        "¥${String.format(java.util.Locale.US, "%.2f", result.price)}"
+    }
+    return "$priceStr / ${result.totalQuantity}${unitStr}" +
             if (result.count > 1) " (×${result.count})" else ""
 }
 

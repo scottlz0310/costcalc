@@ -41,9 +41,9 @@ object BoundedSubsetSum {
 
         if (items.isEmpty()) return Triple(null, emptyList(), emptyList())
 
-        // DPの上限: target + 最大単価 (over候補のため少し超えてもOK)
+        // DPの上限: target + 最大単価 × 2 (over候補のため十分な範囲を確保)
         val maxDenom = inventory.maxOfOrNull { it.denomination } ?: 0
-        val dpMax = target + maxDenom
+        val dpMax = target + maxOf(maxDenom * 2, 100)
 
         // dp[amount] = reachability + traceback配列
         val reachable = BooleanArray(dpMax + 1) { false }
