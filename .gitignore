@@ -10,8 +10,7 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
-*.jar
+# Package Files (exclude gradle-wrapper.jar which must be committed)
 *.war
 *.nar
 *.ear
@@ -23,5 +22,26 @@
 hs_err_pid*
 replay_pid*
 
-# Kotlin Gradle plugin data, see https://kotlinlang.org/docs/whatsnew20.html#new-directory-for-kotlin-data-in-gradle-projects
+# Kotlin Gradle plugin data
 .kotlin/
+
+# Android build artifacts
+build/
+.gradle/
+local.properties
+*.apk
+*.aab
+*.ap_
+
+# Android Studio / IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+
+# Proguard
+proguard/
+
+# Test output
+test-results/
