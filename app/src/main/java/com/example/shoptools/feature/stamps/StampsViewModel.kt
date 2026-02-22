@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shoptools.core.*
 import com.example.shoptools.feature.settings.data.SettingsRepository
+import com.example.shoptools.feature.stamps.data.StampsRepository
 import com.example.shoptools.feature.stamps.domain.BoundedSubsetSum
 import com.example.shoptools.feature.stamps.domain.StampCombination
 import com.example.shoptools.feature.stamps.domain.StampItem
@@ -11,9 +12,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
 
@@ -41,6 +44,7 @@ sealed class StampsEvent {
     data class UpdateDenomination(val id: String, val value: String) : StampsEvent()
     data class UpdateStock(val id: String, val value: String) : StampsEvent()
     data class RemoveRow(val id: String) : StampsEvent()
+    data class ClearRow(val id: String) : StampsEvent()
     data class UpdateTarget(val value: String) : StampsEvent()
     object Calculate : StampsEvent()
 }
@@ -48,6 +52,7 @@ sealed class StampsEvent {
 @HiltViewModel
 class StampsViewModel @Inject constructor(
     settingsRepository: SettingsRepository,
+    private val stampsRepository: StampsRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -61,17 +66,47 @@ class StampsViewModel @Inject constructor(
                 _uiState.update { it.copy(useDigitSeparator = settings.useDigitSeparator) }
             }
             .launchIn(viewModelScope)
+
+        // 保存済みデータを初期ロード
+        viewModelScope.launch {
+            val saved = stampsRepository.stampsFlow.first()
+            if (saved.rows.isNotEmpty()) {
+                _uiState.update { state ->
+                    val hasUserInput = state.target.isNotBlank() ||
+                        state.rows.any { row -> row.denomination.isNotBlank() || row.stock.isNotBlank() }
+                    if (hasUserInput) {
+                        state
+                    } else {
+                        state.copy(
+                            rows = saved.rows.map { (denom, stock) ->
+                                StampInventoryRow(denomination = denom, stock = stock)
+                            },
+                            target = saved.target,
+                        )
+                    }
+                }
+            } else {
+                // 初回起動時は初期状態を保存して次回起動時も一貫した行数を保証
+                saveState()
+            }
+        }
     }
 
     fun onEvent(event: StampsEvent) {
         when (event) {
-            is StampsEvent.AddRow -> _uiState.update { it.copy(rows = it.rows + StampInventoryRow()) }
+            is StampsEvent.AddRow -> addRow()
             is StampsEvent.UpdateDenomination -> updateDenomination(event.id, event.value)
             is StampsEvent.UpdateStock -> updateStock(event.id, event.value)
-            is StampsEvent.RemoveRow -> _uiState.update { s -> s.copy(rows = s.rows.filter { it.id != event.id }) }
-            is StampsEvent.UpdateTarget -> _uiState.update { it.copy(target = event.value, targetError = "", hasResult = false) }
+            is StampsEvent.RemoveRow -> removeRow(event.id)
+            is StampsEvent.ClearRow -> clearRow(event.id)
+            is StampsEvent.UpdateTarget -> updateTarget(event.value)
             is StampsEvent.Calculate -> calculate()
         }
+    }
+
+    private fun addRow() {
+        _uiState.update { it.copy(rows = it.rows + StampInventoryRow()) }
+        saveState()
     }
 
     private fun updateDenomination(id: String, value: String) {
@@ -88,6 +123,7 @@ class StampsViewModel @Inject constructor(
                 hasResult = false,
             )
         }
+        saveState()
     }
 
     private fun updateStock(id: String, value: String) {
@@ -103,6 +139,37 @@ class StampsViewModel @Inject constructor(
                 },
                 hasResult = false,
             )
+        }
+        saveState()
+    }
+
+    private fun removeRow(id: String) {
+        _uiState.update { s -> s.copy(rows = s.rows.filter { it.id != id }) }
+        saveState()
+    }
+
+    private fun clearRow(id: String) {
+        _uiState.update { state ->
+            state.copy(
+                rows = state.rows.map { row ->
+                    if (row.id != id) row else StampInventoryRow(id = row.id)
+                },
+                hasResult = false,
+            )
+        }
+        saveState()
+    }
+
+    private fun updateTarget(value: String) {
+        _uiState.update { it.copy(target = value, targetError = "", hasResult = false) }
+        saveState()
+    }
+
+    private fun saveState() {
+        viewModelScope.launch {
+            val state = _uiState.value
+            val rows = state.rows.map { it.denomination to it.stock }
+            stampsRepository.saveState(rows, state.target)
         }
     }
 
