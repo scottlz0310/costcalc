@@ -54,10 +54,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
     buildFeatures {
         compose = true
     }
@@ -83,7 +79,7 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    add("kapt", libs.hilt.compiler) // kapt()はKotlin 2.3.xでオーバーロード解決の問題があるためadd()を使用
     implementation(libs.hilt.navigation.compose)
 
     // DataStore
