@@ -14,16 +14,16 @@ jobs:
 
     steps:
       - name: コードをチェックアウト
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: JDK 17 をセットアップ
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Gradle キャッシュを設定
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.gradle/caches
@@ -40,7 +40,7 @@ jobs:
 
       - name: テストレポートをアップロード
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: test-results-${{ github.run_number }}
           path: app/build/reports/tests/
@@ -53,16 +53,16 @@ jobs:
 
     steps:
       - name: コードをチェックアウト
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: JDK 17 をセットアップ
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Gradle キャッシュを設定
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.gradle/caches
@@ -91,7 +91,7 @@ jobs:
         run: ./gradlew assembleRelease --no-daemon
 
       - name: APK をアーティファクトとしてアップロード
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: shoptools-release-${{ github.run_number }}
           path: app/build/outputs/apk/release/app-release.apk
