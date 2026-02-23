@@ -2,7 +2,7 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
 }
@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
+    implementation(libs.compose.material.icons.core)
     debugImplementation(libs.compose.ui.tooling)
 
     // Navigation
@@ -79,7 +80,7 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
-    add("kapt", libs.hilt.compiler) // kapt()はKotlin 2.3.xでオーバーロード解決の問題があるためadd()を使用
+    ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
     // DataStore
