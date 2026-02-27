@@ -50,6 +50,7 @@ jobs:
     name: ビルド・署名・アップロード
     runs-on: ubuntu-latest
     needs: test
+    if: github.event_name != 'pull_request'
 
     steps:
       - name: コードをチェックアウト
@@ -74,25 +75,6 @@ jobs:
       - name: keystore ファイルを復元
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > ${{ runner.temp }}/release.keystore
-
-      - name: keystore を AGP 互換の legacy PKCS12 形式に変換
-        run: |
-          # JDK 17 新形式 PKCS12 は AGP 内蔵の旧 BouncyCastle で読めないため、
-          # legacy アルゴリズム（PBEWithSHA1AndDESede / HmacPBESHA1）で変換する
-          keytool -importkeystore \
-            -srckeystore "${{ runner.temp }}/release.keystore" \
-            -destkeystore "${{ runner.temp }}/release-compat.keystore" \
-            -deststoretype pkcs12 \
-            -srcstorepass "${{ secrets.ANDROID_SIGNING_STORE_PASSWORD }}" \
-            -deststorepass "${{ secrets.ANDROID_SIGNING_STORE_PASSWORD }}" \
-            -noprompt \
-            -J-Dkeystore.pkcs12.certProtectionAlgorithm=PBEWithSHA1AndRC2_40 \
-            -J-Dkeystore.pkcs12.certPbeIterationCount=50000 \
-            -J-Dkeystore.pkcs12.keyProtectionAlgorithm=PBEWithSHA1AndDESede \
-            -J-Dkeystore.pkcs12.keyPbeIterationCount=50000 \
-            -J-Dkeystore.pkcs12.macAlgorithm=HmacPBESHA1 \
-            -J-Dkeystore.pkcs12.macIterationCount=100000
-          mv "${{ runner.temp }}/release-compat.keystore" "${{ runner.temp }}/release.keystore"
 
       - name: keystore.properties を生成
         run: |
