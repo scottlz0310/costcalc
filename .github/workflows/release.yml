@@ -50,7 +50,7 @@ jobs:
     name: ビルド・署名・アップロード
     runs-on: ubuntu-latest
     needs: test
-    if: github.event_name != 'pull_request'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - name: コードをチェックアウト
