@@ -1,9 +1,16 @@
 /**
  * アプリアイコン生成スクリプト
  *
+ * 【事前準備】
+ *   npm install        # @napi-rs/canvas をインストール（初回のみ）
+ *
  * 使い方:
  *   1. icon_source.png（1024×1024 以上推奨）をプロジェクトルートに置く
  *   2. node scripts/generate_icons.mjs
+ *      または npm run gen-icons
+ *
+ * 備考:
+ *   - icon_source.png が正方形でない場合は中央を基準にクロップして処理する
  *
  * 出力:
  *   - app/src/main/res/mipmap-[density]/ic_launcher.png（各解像度）
@@ -37,14 +44,20 @@ const RES = join(ROOT, 'app', 'src', 'main', 'res');
 /**
  * 段階的ダウンスケール（一気に縮小せず半分ずつ縮小することで品質を向上）
  * Canvas の imageSmoothingQuality を 'high' に設定して補間精度を最大化する。
+ * ソース画像が正方形でない場合は中央を正方形にクロップしてからリサイズする。
  */
 function stepDownscale(srcImg, targetSize) {
-  let currentSize = Math.max(srcImg.width, srcImg.height);
+  // 正方形にクロップ（中央基準）
+  const cropSize = Math.min(srcImg.width, srcImg.height);
+  const sx = (srcImg.width - cropSize) / 2;
+  const sy = (srcImg.height - cropSize) / 2;
+
+  let currentSize = cropSize;
   let canvas = createCanvas(currentSize, currentSize);
   let ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
-  ctx.drawImage(srcImg, 0, 0, currentSize, currentSize);
+  ctx.drawImage(srcImg, sx, sy, cropSize, cropSize, 0, 0, currentSize, currentSize);
 
   // targetSize の2倍を超えている間は半分ずつ縮小
   while (currentSize > targetSize * 2) {

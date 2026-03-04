@@ -1,0 +1,12 @@
+{
+  "name": "costcalc-scripts",
+  "version": "1.0.0",
+  "description": "アイコン生成などの開発補助スクリプト",
+  "type": "module",
+  "scripts": {
+    "gen-icons": "node scripts/generate_icons.mjs"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.67"
+  }
+}
