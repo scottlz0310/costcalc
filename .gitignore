@@ -47,4 +47,12 @@ proguard/
 test-results/
 
 # 署名設定（パスワードを含むため git 管理外）
+
+# アイコン生成スクリプト用（Node.js）
+node_modules/
+
+# アイコン素材（大容量・生成物）
+icon_source.png
+play_store_icon.png
+icon_compare.png
 keystore.properties
