@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.example.shoptools"
-    compileSdk = 35
+    compileSdk = 36
 
     val keystoreProps = Properties().also { props ->
         val propsFile = rootProject.file("keystore.properties")
@@ -31,7 +31,7 @@ android {
     defaultConfig {
         applicationId = "com.example.shoptools"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
