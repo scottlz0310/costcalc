@@ -12,7 +12,7 @@
 - Hilt（DI）
 - DataStore Preferences（設定の永続化）
 - JUnit 4（単体テスト）
-- minSdk 26 / targetSdk 35 / JDK 17
+- minSdk 26 / targetSdk 36 / JDK 17
 
 ## ビルド・テスト
 
