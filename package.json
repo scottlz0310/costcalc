@@ -7,6 +7,6 @@
     "gen-icons": "node scripts/generate_icons.mjs"
   },
   "dependencies": {
-    "@napi-rs/canvas": "^0.1.96"
+    "@napi-rs/canvas": "^0.1.97"
   }
 }
