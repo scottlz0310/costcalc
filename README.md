@@ -45,6 +45,14 @@ cd costcalc
 ./gradlew test
 ```
 
+### Git フック（lefthook）
+
+本リポジトリは [lefthook](https://github.com/evilmartians/lefthook) で pre-push に Android ユニットテストを設定している。**クローン後に一度だけ** `lefthook install` を実行すること（未登録だとフックは動作しない）。
+
+```bash
+lefthook install
+```
+
 ---
 
 ## アーキテクチャ
