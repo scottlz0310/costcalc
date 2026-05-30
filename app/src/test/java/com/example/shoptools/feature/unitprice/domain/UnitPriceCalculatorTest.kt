@@ -5,7 +5,6 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class UnitPriceCalculatorTest {
-
     @Test
     fun testBasicCalculation() {
         // 198 / (0.9 * 1) = 220.0

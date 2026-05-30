@@ -17,10 +17,12 @@ fun LargeResultCard(
     modifier: Modifier = Modifier,
     highlighted: Boolean = false,
 ) {
-    val containerColor = if (highlighted)
-        MaterialTheme.colorScheme.primaryContainer
-    else
-        MaterialTheme.colorScheme.surfaceVariant
+    val containerColor =
+        if (highlighted) {
+            MaterialTheme.colorScheme.primaryContainer
+        } else {
+            MaterialTheme.colorScheme.surfaceVariant
+        }
 
     Card(
         modifier = modifier.fillMaxWidth(),

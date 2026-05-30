@@ -36,9 +36,10 @@ fun StampsScreen(viewModel: StampsViewModel) {
         if (!state.hasResult) {
             item {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
@@ -54,7 +55,9 @@ fun StampsScreen(viewModel: StampsViewModel) {
                     LargeResultCard(
                         title = stringResource(R.string.label_exact),
                         mainValue = "${formatAmount(state.exact!!.total, state.useDigitSeparator)}円",
-                        subInfo = "${state.exact!!.pieces}${stringResource(R.string.label_pieces)}  ${BoundedSubsetSum.compositionToString(state.exact!!.composition)}",
+                        subInfo = "${state.exact!!.pieces}${stringResource(
+                            R.string.label_pieces,
+                        )}  ${BoundedSubsetSum.compositionToString(state.exact!!.composition)}",
                         highlighted = true,
                     )
                 }
@@ -68,7 +71,11 @@ fun StampsScreen(viewModel: StampsViewModel) {
                     )
                 }
                 items(state.under) { combo ->
-                    StampResultCard(combo = combo, target = state.target.toIntOrNull() ?: 0, useDigitSeparator = state.useDigitSeparator)
+                    StampResultCard(
+                        combo = combo,
+                        target = state.target.toIntOrNull() ?: 0,
+                        useDigitSeparator = state.useDigitSeparator,
+                    )
                 }
             }
             if (state.over.isNotEmpty()) {
@@ -80,7 +87,11 @@ fun StampsScreen(viewModel: StampsViewModel) {
                     )
                 }
                 items(state.over) { combo ->
-                    StampResultCard(combo = combo, target = state.target.toIntOrNull() ?: 0, useDigitSeparator = state.useDigitSeparator)
+                    StampResultCard(
+                        combo = combo,
+                        target = state.target.toIntOrNull() ?: 0,
+                        useDigitSeparator = state.useDigitSeparator,
+                    )
                 }
             }
         }
@@ -134,7 +145,11 @@ fun StampsScreen(viewModel: StampsViewModel) {
 }
 
 @Composable
-private fun StampResultCard(combo: StampCombination, target: Int, useDigitSeparator: Boolean = false) {
+private fun StampResultCard(
+    combo: StampCombination,
+    target: Int,
+    useDigitSeparator: Boolean = false,
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
@@ -145,7 +160,8 @@ private fun StampResultCard(combo: StampCombination, target: Int, useDigitSepara
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
-                text = "差分: ${if (combo.total >= target) "+" else ""}${combo.total - target}円  " +
+                text =
+                    "差分: ${if (combo.total >= target) "+" else ""}${combo.total - target}円  " +
                         "${combo.pieces}枚  " +
                         BoundedSubsetSum.compositionToString(combo.composition),
                 style = MaterialTheme.typography.bodySmall,

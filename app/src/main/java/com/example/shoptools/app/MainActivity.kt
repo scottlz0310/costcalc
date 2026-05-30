@@ -30,9 +30,15 @@ import com.example.shoptools.feature.unitprice.UnitPriceViewModel
 import com.example.shoptools.feature.unitprice.ui.UnitPriceScreen
 import dagger.hilt.android.AndroidEntryPoint
 
-sealed class Screen(val route: String, val labelRes: Int, val icon: ImageVector) {
+sealed class Screen(
+    val route: String,
+    val labelRes: Int,
+    val icon: ImageVector,
+) {
     object UnitPrice : Screen("unit_price", R.string.tab_unit_price, Icons.Filled.ShoppingCart)
+
     object Stamps : Screen("stamps", R.string.tab_stamps, Icons.Filled.Email)
+
     object Settings : Screen("settings", R.string.tab_settings, Icons.Filled.Settings)
 }
 
@@ -79,16 +85,16 @@ private fun MainScaffold() {
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                        }
+                        },
                     )
                 }
             }
-        }
+        },
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = Screen.UnitPrice.route,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
         ) {
             composable(Screen.UnitPrice.route) {
                 val vm: UnitPriceViewModel = hiltViewModel()

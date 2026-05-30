@@ -1,6 +1,9 @@
 package com.example.shoptools.core
 
-data class ValidationResult(val isValid: Boolean, val errorMessage: String = "")
+data class ValidationResult(
+    val isValid: Boolean,
+    val errorMessage: String = "",
+)
 
 fun validatePrice(input: String): ValidationResult {
     val value = input.toDoubleOrNull()

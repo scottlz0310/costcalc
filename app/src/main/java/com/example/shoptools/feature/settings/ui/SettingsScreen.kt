@@ -19,9 +19,10 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
     val state by viewModel.uiState.collectAsState()
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         // --- Font size ---
@@ -29,22 +30,23 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
             text = stringResource(R.string.settings_font_size),
             style = MaterialTheme.typography.titleMedium,
         )
-        val fontOptions = listOf(
-            FontSizePreset.NORMAL to stringResource(R.string.settings_font_normal),
-            FontSizePreset.LARGE to stringResource(R.string.settings_font_large),
-            FontSizePreset.XLARGE to stringResource(R.string.settings_font_xlarge),
-        )
+        val fontOptions =
+            listOf(
+                FontSizePreset.NORMAL to stringResource(R.string.settings_font_normal),
+                FontSizePreset.LARGE to stringResource(R.string.settings_font_large),
+                FontSizePreset.XLARGE to stringResource(R.string.settings_font_xlarge),
+            )
         Column(modifier = Modifier.selectableGroup()) {
             fontOptions.forEach { (preset, label) ->
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = state.fontSizePreset == preset,
-                            onClick = { viewModel.setFontSizePreset(preset) },
-                            role = Role.RadioButton,
-                        )
-                        .padding(vertical = 8.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = state.fontSizePreset == preset,
+                                onClick = { viewModel.setFontSizePreset(preset) },
+                                role = Role.RadioButton,
+                            ).padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(
