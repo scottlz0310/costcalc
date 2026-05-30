@@ -5,6 +5,9 @@ pre-commit:
   commands:
     ktlint:
       glob: "*.kt"
+      # --format は auto-correct 適用後に修正できない違反が残っても exit 0 を返す
+      # (.editorconfig で function-naming / no-wildcard-imports を抑制済みのため)。
+      # 修正されたファイルは stage_fixed: true で自動的に再ステージングされる。
       run: ktlint --format {staged_files}
       stage_fixed: true
 
