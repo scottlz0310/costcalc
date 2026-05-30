@@ -45,98 +45,127 @@ data class UnitPriceUiState(
 
 sealed class UnitPriceEvent {
     object AddRow : UnitPriceEvent()
-    data class UpdateRow(val row: ProductRow) : UnitPriceEvent()
-    data class RemoveRow(val id: String) : UnitPriceEvent()
-    data class ClearRow(val id: String) : UnitPriceEvent()
+
+    data class UpdateRow(
+        val row: ProductRow,
+    ) : UnitPriceEvent()
+
+    data class RemoveRow(
+        val id: String,
+    ) : UnitPriceEvent()
+
+    data class ClearRow(
+        val id: String,
+    ) : UnitPriceEvent()
 }
 
 @HiltViewModel
-class UnitPriceViewModel @Inject constructor(
-    settingsRepository: SettingsRepository,
-) : ViewModel() {
+class UnitPriceViewModel
+    @Inject
+    constructor(
+        settingsRepository: SettingsRepository,
+    ) : ViewModel() {
+        private val _uiState = MutableStateFlow(UnitPriceUiState(rows = listOf(ProductRow(), ProductRow())))
+        val uiState: StateFlow<UnitPriceUiState> = _uiState.asStateFlow()
 
-    private val _uiState = MutableStateFlow(UnitPriceUiState(rows = listOf(ProductRow(), ProductRow())))
-    val uiState: StateFlow<UnitPriceUiState> = _uiState.asStateFlow()
+        init {
+            settingsRepository.settingsFlow
+                .onEach { settings ->
+                    _uiState.update { it.copy(useDigitSeparator = settings.useDigitSeparator) }
+                }.launchIn(viewModelScope)
+        }
 
-    init {
-        settingsRepository.settingsFlow
-            .onEach { settings ->
-                _uiState.update { it.copy(useDigitSeparator = settings.useDigitSeparator) }
+        fun onEvent(event: UnitPriceEvent) {
+            when (event) {
+                is UnitPriceEvent.AddRow -> addRow()
+                is UnitPriceEvent.UpdateRow -> updateRow(event.row)
+                is UnitPriceEvent.RemoveRow -> removeRow(event.id)
+                is UnitPriceEvent.ClearRow -> clearRow(event.id)
             }
-            .launchIn(viewModelScope)
-    }
+        }
 
-    fun onEvent(event: UnitPriceEvent) {
-        when (event) {
-            is UnitPriceEvent.AddRow -> addRow()
-            is UnitPriceEvent.UpdateRow -> updateRow(event.row)
-            is UnitPriceEvent.RemoveRow -> removeRow(event.id)
-            is UnitPriceEvent.ClearRow -> clearRow(event.id)
+        private fun addRow() {
+            _uiState.update { state ->
+                state.copy(rows = state.rows + ProductRow())
+            }
+            recalculate()
         }
-    }
 
-    private fun addRow() {
-        _uiState.update { state ->
-            state.copy(rows = state.rows + ProductRow())
+        private fun updateRow(updated: ProductRow) {
+            _uiState.update { state ->
+                val validated = validated(updated)
+                state.copy(rows = state.rows.map { if (it.id == updated.id) validated else it })
+            }
+            recalculate()
         }
-        recalculate()
-    }
 
-    private fun updateRow(updated: ProductRow) {
-        _uiState.update { state ->
-            val validated = validated(updated)
-            state.copy(rows = state.rows.map { if (it.id == updated.id) validated else it })
+        private fun removeRow(id: String) {
+            _uiState.update { state ->
+                state.copy(rows = state.rows.filter { it.id != id })
+            }
+            recalculate()
         }
-        recalculate()
-    }
 
-    private fun removeRow(id: String) {
-        _uiState.update { state ->
-            state.copy(rows = state.rows.filter { it.id != id })
+        private fun clearRow(id: String) {
+            _uiState.update { state ->
+                state.copy(
+                    rows =
+                        state.rows.map { row ->
+                            if (row.id != id) row else ProductRow(id = row.id)
+                        },
+                )
+            }
+            recalculate()
         }
-        recalculate()
-    }
 
-    private fun clearRow(id: String) {
-        _uiState.update { state ->
-            state.copy(rows = state.rows.map { row ->
-                if (row.id != id) row else ProductRow(id = row.id)
-            })
+        private fun validated(row: ProductRow): ProductRow {
+            val priceErr =
+                if (row.price.isBlank()) {
+                    ""
+                } else {
+                    validatePrice(row.price).let {
+                        if (!it.isValid) it.errorMessage else ""
+                    }
+                }
+            val quantityErr =
+                if (row.quantity.isBlank()) {
+                    ""
+                } else {
+                    validateQuantity(row.quantity).let {
+                        if (!it.isValid) it.errorMessage else ""
+                    }
+                }
+            val countErr =
+                if (row.count.isBlank()) {
+                    ""
+                } else {
+                    validateCount(row.count).let {
+                        if (!it.isValid) it.errorMessage else ""
+                    }
+                }
+            return row.copy(priceError = priceErr, quantityError = quantityErr, countError = countErr)
         }
-        recalculate()
-    }
 
-    private fun validated(row: ProductRow): ProductRow {
-        val priceErr = if (row.price.isBlank()) "" else validatePrice(row.price).let {
-            if (!it.isValid) it.errorMessage else ""
+        private fun recalculate() {
+            val rows = _uiState.value.rows
+            val results =
+                rows
+                    .mapNotNull { row ->
+                        val price = row.price.toDoubleOrNull() ?: return@mapNotNull null
+                        val quantity = row.quantity.toDoubleOrNull() ?: return@mapNotNull null
+                        val count = row.count.toIntOrNull() ?: return@mapNotNull null
+                        if (price <= 0 || quantity <= 0 || count < 1) return@mapNotNull null
+                        val unitPrice = UnitPriceCalculator.calculate(price, quantity, count)
+                        UnitPriceResult(
+                            id = row.id,
+                            name = row.name,
+                            unitPrice = unitPrice,
+                            totalQuantity = quantity * count,
+                            unit = row.unit,
+                            price = price,
+                            count = count,
+                        )
+                    }.sortedBy { it.unitPrice }
+            _uiState.update { it.copy(results = results) }
         }
-        val quantityErr = if (row.quantity.isBlank()) "" else validateQuantity(row.quantity).let {
-            if (!it.isValid) it.errorMessage else ""
-        }
-        val countErr = if (row.count.isBlank()) "" else validateCount(row.count).let {
-            if (!it.isValid) it.errorMessage else ""
-        }
-        return row.copy(priceError = priceErr, quantityError = quantityErr, countError = countErr)
     }
-
-    private fun recalculate() {
-        val rows = _uiState.value.rows
-        val results = rows.mapNotNull { row ->
-            val price = row.price.toDoubleOrNull() ?: return@mapNotNull null
-            val quantity = row.quantity.toDoubleOrNull() ?: return@mapNotNull null
-            val count = row.count.toIntOrNull() ?: return@mapNotNull null
-            if (price <= 0 || quantity <= 0 || count < 1) return@mapNotNull null
-            val unitPrice = UnitPriceCalculator.calculate(price, quantity, count)
-            UnitPriceResult(
-                id = row.id,
-                name = row.name,
-                unitPrice = unitPrice,
-                totalQuantity = quantity * count,
-                unit = row.unit,
-                price = price,
-                count = count,
-            )
-        }.sortedBy { it.unitPrice }
-        _uiState.update { it.copy(results = results) }
-    }
-}

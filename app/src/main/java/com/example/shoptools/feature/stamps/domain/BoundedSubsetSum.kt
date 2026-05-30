@@ -4,12 +4,16 @@ package com.example.shoptools.feature.stamps.domain
  * 切手在庫の組み合わせを計算する
  * 二進分解 + 0/1 DP + 構成復元
  */
-data class StampItem(val denomination: Int, val count: Int)
+data class StampItem(
+    val denomination: Int,
+    val count: Int,
+)
+
 data class StampCombination(
     val total: Int,
-    val diff: Int,  // abs(total - target), 0 if exact
+    val diff: Int, // abs(total - target), 0 if exact
     val pieces: Int,
-    val composition: Map<Int, Int>,  // denomination -> count used
+    val composition: Map<Int, Int>, // denomination -> count used
 )
 
 object BoundedSubsetSum {
@@ -25,7 +29,11 @@ object BoundedSubsetSum {
         if (target <= 0) return Triple(null, emptyList(), emptyList())
 
         // 二進分解: 各額面×枚数を1/2/4...に分解して0/1ナップサック問題に変換
-        data class Item(val denomination: Int, val originalDenomination: Int, val multiplier: Int)
+        data class Item(
+            val denomination: Int,
+            val originalDenomination: Int,
+            val multiplier: Int,
+        )
         val items = mutableListOf<Item>()
         for (stamp in inventory) {
             if (stamp.denomination <= 0 || stamp.count <= 0) continue
@@ -49,7 +57,7 @@ object BoundedSubsetSum {
         // 各金額に到達する最小枚数も追跡し、より少ない枚数のパスが見つかれば更新する
         val reachable = BooleanArray(dpMax + 1) { false }
         reachable[0] = true
-        val from = Array(dpMax + 1) { -1 }  // -1 = no item used
+        val from = Array(dpMax + 1) { -1 } // -1 = no item used
         val itemUsed = Array(dpMax + 1) { -1 } // which item index was last used
         val piecesForAmount = IntArray(dpMax + 1) { dpMax + 1 }
         piecesForAmount[0] = 0
@@ -111,9 +119,8 @@ object BoundedSubsetSum {
     }
 
     /** 構成を "84x1, 63x2" のような文字列に変換 */
-    fun compositionToString(comp: Map<Int, Int>): String {
-        return comp.entries
+    fun compositionToString(comp: Map<Int, Int>): String =
+        comp.entries
             .sortedByDescending { it.key }
-            .joinToString(", ") { (denom, cnt) -> "${denom}x${cnt}" }
-    }
+            .joinToString(", ") { (denom, cnt) -> "${denom}x$cnt" }
 }

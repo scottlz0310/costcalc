@@ -23,30 +23,34 @@ data class AppSettings(
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 @Singleton
-class SettingsRepository @Inject constructor(
-    @ApplicationContext private val context: Context,
-) {
-    private val FONT_SIZE_PRESET = stringPreferencesKey("font_size_preset")
-    private val USE_DIGIT_SEPARATOR = booleanPreferencesKey("use_digit_separator")
+class SettingsRepository
+    @Inject
+    constructor(
+        @ApplicationContext private val context: Context,
+    ) {
+        private val FONT_SIZE_PRESET = stringPreferencesKey("font_size_preset")
+        private val USE_DIGIT_SEPARATOR = booleanPreferencesKey("use_digit_separator")
 
-    val settingsFlow: Flow<AppSettings> = context.dataStore.data.map { prefs ->
-        AppSettings(
-            fontSizePreset = prefs[FONT_SIZE_PRESET]?.let {
-                runCatching { FontSizePreset.valueOf(it) }.getOrNull()
-            } ?: FontSizePreset.NORMAL,
-            useDigitSeparator = prefs[USE_DIGIT_SEPARATOR] ?: false,
-        )
-    }
+        val settingsFlow: Flow<AppSettings> =
+            context.dataStore.data.map { prefs ->
+                AppSettings(
+                    fontSizePreset =
+                        prefs[FONT_SIZE_PRESET]?.let {
+                            runCatching { FontSizePreset.valueOf(it) }.getOrNull()
+                        } ?: FontSizePreset.NORMAL,
+                    useDigitSeparator = prefs[USE_DIGIT_SEPARATOR] ?: false,
+                )
+            }
 
-    suspend fun setFontSizePreset(preset: FontSizePreset) {
-        context.dataStore.edit { prefs ->
-            prefs[FONT_SIZE_PRESET] = preset.name
+        suspend fun setFontSizePreset(preset: FontSizePreset) {
+            context.dataStore.edit { prefs ->
+                prefs[FONT_SIZE_PRESET] = preset.name
+            }
+        }
+
+        suspend fun setUseDigitSeparator(enabled: Boolean) {
+            context.dataStore.edit { prefs ->
+                prefs[USE_DIGIT_SEPARATOR] = enabled
+            }
         }
     }
-
-    suspend fun setUseDigitSeparator(enabled: Boolean) {
-        context.dataStore.edit { prefs ->
-            prefs[USE_DIGIT_SEPARATOR] = enabled
-        }
-    }
-}

@@ -36,9 +36,10 @@ fun UnitPriceScreen(viewModel: UnitPriceViewModel) {
         if (state.results.isEmpty()) {
             item {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
@@ -52,8 +53,13 @@ fun UnitPriceScreen(viewModel: UnitPriceViewModel) {
             val cheapest = state.results.first()
             item {
                 LargeResultCard(
-                    title = stringResource(R.string.label_cheapest) + (if (cheapest.name.isNotBlank()) "  ${cheapest.name}" else ""),
-                    mainValue = "${formatUnitPrice(cheapest.unitPrice, state.useDigitSeparator)} ${stringResource(R.string.label_unit_price)}",
+                    title =
+                        stringResource(R.string.label_cheapest) +
+                            (if (cheapest.name.isNotBlank()) "  ${cheapest.name}" else ""),
+                    mainValue = "${formatUnitPrice(
+                        cheapest.unitPrice,
+                        state.useDigitSeparator,
+                    )} ${stringResource(R.string.label_unit_price)}",
                     subInfo = buildSubInfo(cheapest),
                     highlighted = true,
                 )
@@ -63,7 +69,10 @@ fun UnitPriceScreen(viewModel: UnitPriceViewModel) {
                 itemsIndexed(state.results.drop(1)) { index, result ->
                     LargeResultCard(
                         title = if (result.name.isNotBlank()) result.name else "商品 ${index + 2}",
-                        mainValue = "${formatUnitPrice(result.unitPrice, state.useDigitSeparator)} ${stringResource(R.string.label_unit_price)}",
+                        mainValue = "${formatUnitPrice(
+                            result.unitPrice,
+                            state.useDigitSeparator,
+                        )} ${stringResource(R.string.label_unit_price)}",
                         subInfo = buildSubInfo(result),
                         highlighted = false,
                     )
@@ -96,13 +105,14 @@ fun UnitPriceScreen(viewModel: UnitPriceViewModel) {
 
 private fun buildSubInfo(result: UnitPriceResult): String {
     val unitStr = if (result.unit.isNotBlank()) result.unit else "unit"
-    val priceStr = if (result.price == result.price.toLong().toDouble()) {
-        "¥${result.price.toLong()}"
-    } else {
-        "¥${String.format(java.util.Locale.US, "%.2f", result.price)}"
-    }
-    return "$priceStr / ${result.totalQuantity}${unitStr}" +
-            if (result.count > 1) " (×${result.count})" else ""
+    val priceStr =
+        if (result.price == result.price.toLong().toDouble()) {
+            "¥${result.price.toLong()}"
+        } else {
+            "¥${String.format(java.util.Locale.US, "%.2f", result.price)}"
+        }
+    return "$priceStr / ${result.totalQuantity}$unitStr" +
+        if (result.count > 1) " (×${result.count})" else ""
 }
 
 @Composable

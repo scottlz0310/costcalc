@@ -1,0 +1,19 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.kt]
+max_line_length = 120
+# Compose の @Composable 関数は大文字始まりが公式慣例のため除外
+ktlint_function_naming_ignore_when_annotated_with = Composable,Preview
+# Android Studio が自動生成するワイルドカードインポートを許可
+ktlint_standard_no-wildcard-imports = disabled
+
+[*.kts]
+max_line_length = 120

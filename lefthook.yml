@@ -1,6 +1,16 @@
 # lefthook: costcalc (Kotlin/Android)
-# Kotlin リンタは現状未導入（後続 ISSUE で ktlint CLI 導入を検討）。
+# pre-commit で ktlint による Kotlin コードフォーマット検査を実行する。
 # pre-push で CI と同等の Android ユニットテストを実行し、push 前の最終ゲートとする。
+pre-commit:
+  commands:
+    ktlint:
+      glob: "*.kt"
+      # --format は auto-correct 適用後に修正できない違反が残っても exit 0 を返す
+      # (.editorconfig で function-naming / no-wildcard-imports を抑制済みのため)。
+      # 修正されたファイルは stage_fixed: true で自動的に再ステージングされる。
+      run: ktlint --format {staged_files}
+      stage_fixed: true
+
 pre-push:
   commands:
     unit-test:

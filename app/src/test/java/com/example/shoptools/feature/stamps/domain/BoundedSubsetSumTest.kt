@@ -4,13 +4,13 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class BoundedSubsetSumTest {
-
-    private val defaultInventory = listOf(
-        StampItem(84, 5),
-        StampItem(63, 3),
-        StampItem(10, 10),
-        StampItem(1, 50),
-    )
+    private val defaultInventory =
+        listOf(
+            StampItem(84, 5),
+            StampItem(63, 3),
+            StampItem(10, 10),
+            StampItem(1, 50),
+        )
 
     @Test
     fun testExactMatch() {
@@ -29,16 +29,20 @@ class BoundedSubsetSumTest {
             assertTrue("Under combo total ${combo.total} should be < 240", combo.total < 240)
         }
         for (i in 0 until under.size - 1) {
-            assertTrue("Under list should be sorted by diff ascending",
-                under[i].diff <= under[i + 1].diff)
+            assertTrue(
+                "Under list should be sorted by diff ascending",
+                under[i].diff <= under[i + 1].diff,
+            )
         }
         // Over results should all be > 240 and sorted by diff ascending
         for (combo in over) {
             assertTrue("Over combo total ${combo.total} should be > 240", combo.total > 240)
         }
         for (i in 0 until over.size - 1) {
-            assertTrue("Over list should be sorted by diff ascending",
-                over[i].diff <= over[i + 1].diff)
+            assertTrue(
+                "Over list should be sorted by diff ascending",
+                over[i].diff <= over[i + 1].diff,
+            )
         }
     }
 
@@ -52,11 +56,12 @@ class BoundedSubsetSumTest {
 
     @Test
     fun testZeroStock() {
-        val inventory = listOf(
-            StampItem(84, 0),
-            StampItem(63, 0),
-            StampItem(1, 50),
-        )
+        val inventory =
+            listOf(
+                StampItem(84, 0),
+                StampItem(63, 0),
+                StampItem(1, 50),
+            )
         val (exact, _, _) = BoundedSubsetSum.solve(inventory, 84)
         // Zero stock items should be ignored, so 84 cannot be reached exactly from 1x50=50 max
         assertNull("84 is not reachable from 50x1 stamps", exact)

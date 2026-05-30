@@ -15,39 +15,45 @@ import javax.inject.Singleton
 private val Context.stampsDataStore: DataStore<Preferences> by preferencesDataStore(name = "stamps")
 
 data class PersistedStampsData(
-    val rows: List<Pair<String, String>>,  // denomination to stock
+    val rows: List<Pair<String, String>>, // denomination to stock
     val target: String,
 )
 
 @Singleton
-class StampsRepository @Inject constructor(
-    @ApplicationContext private val context: Context,
-) {
-    private val ROWS_KEY = stringPreferencesKey("stamps_rows")
-    private val TARGET_KEY = stringPreferencesKey("stamps_target")
+class StampsRepository
+    @Inject
+    constructor(
+        @ApplicationContext private val context: Context,
+    ) {
+        private val ROWS_KEY = stringPreferencesKey("stamps_rows")
+        private val TARGET_KEY = stringPreferencesKey("stamps_target")
 
-    val stampsFlow: Flow<PersistedStampsData> = context.stampsDataStore.data.map { prefs ->
-        PersistedStampsData(
-            rows = decodeRows(prefs[ROWS_KEY] ?: ""),
-            target = prefs[TARGET_KEY] ?: "",
-        )
-    }
+        val stampsFlow: Flow<PersistedStampsData> =
+            context.stampsDataStore.data.map { prefs ->
+                PersistedStampsData(
+                    rows = decodeRows(prefs[ROWS_KEY] ?: ""),
+                    target = prefs[TARGET_KEY] ?: "",
+                )
+            }
 
-    suspend fun saveState(rows: List<Pair<String, String>>, target: String) {
-        context.stampsDataStore.edit { prefs ->
-            prefs[ROWS_KEY] = encodeRows(rows)
-            prefs[TARGET_KEY] = target
+        suspend fun saveState(
+            rows: List<Pair<String, String>>,
+            target: String,
+        ) {
+            context.stampsDataStore.edit { prefs ->
+                prefs[ROWS_KEY] = encodeRows(rows)
+                prefs[TARGET_KEY] = target
+            }
+        }
+
+        private fun encodeRows(rows: List<Pair<String, String>>): String =
+            rows.joinToString("|") { "${it.first}:${it.second}" }
+
+        private fun decodeRows(encoded: String): List<Pair<String, String>> {
+            if (encoded.isBlank()) return emptyList()
+            return encoded.split("|").mapNotNull { pair ->
+                val parts = pair.split(":", limit = 2)
+                if (parts.size == 2) parts[0] to parts[1] else null
+            }
         }
     }
-
-    private fun encodeRows(rows: List<Pair<String, String>>): String =
-        rows.joinToString("|") { "${it.first}:${it.second}" }
-
-    private fun decodeRows(encoded: String): List<Pair<String, String>> {
-        if (encoded.isBlank()) return emptyList()
-        return encoded.split("|").mapNotNull { pair ->
-            val parts = pair.split(":", limit = 2)
-            if (parts.size == 2) parts[0] to parts[1] else null
-        }
-    }
-}

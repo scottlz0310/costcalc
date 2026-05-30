@@ -12,7 +12,11 @@ object UnitPriceCalculator {
      * @param count 入数（整数）>= 1
      * @return 単価（Double）。丸めは呼び出し元で行う
      */
-    fun calculate(price: Double, quantity: Double, count: Int): Double {
+    fun calculate(
+        price: Double,
+        quantity: Double,
+        count: Int,
+    ): Double {
         require(price > 0) { "price must be > 0" }
         require(quantity > 0) { "quantity must be > 0" }
         require(count >= 1) { "count must be >= 1" }
