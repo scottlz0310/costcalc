@@ -47,11 +47,26 @@ cd costcalc
 
 ### Git フック（lefthook）
 
-本リポジトリは [lefthook](https://github.com/evilmartians/lefthook) で pre-push に Android ユニットテストを設定している。**クローン後に一度だけ** `lefthook install` を実行すること（未登録だとフックは動作しない）。
+本リポジトリは [lefthook](https://github.com/evilmartians/lefthook) で以下を設定している。
+
+| フック | 内容 |
+|-------|------|
+| pre-commit | ktlint による Kotlin コードフォーマット検査・自動整形 |
+| pre-push | Android ユニットテスト |
+
+**クローン後に一度だけ** 下記を実行すること（未実行だとフックは動作しない）。
 
 ```bash
+# 1. ktlint CLI をインストール（~/.local/bin に配置）
+bash scripts/install-ktlint.sh
+
+# 2. lefthook フックを登録
 lefthook install
 ```
+
+> **Windows の場合**: Git Bash または WSL 上で `scripts/install-ktlint.sh` を実行するか、
+> [ktlint GitHub Releases](https://github.com/pinterest/ktlint/releases/tag/1.5.0) から
+> `ktlint` バイナリを手動ダウンロードして PATH の通ったディレクトリに配置する。
 
 ---
 
