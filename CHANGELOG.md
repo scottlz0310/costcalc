@@ -5,6 +5,13 @@
 
 ---
 
+## [Unreleased] - 2026-05-30
+
+### 追加
+- `lefthook.yml` — lefthook 導入。pre-push で `./gradlew :app:testDebugUnitTest`（Android ユニットテスト）を実行し push 前ゲートとする。Kotlin リンタ（ktlint）は後続 #32 で対応予定。
+
+---
+
 ## [1.0.0] - 2026-02-22
 
 ### 追加

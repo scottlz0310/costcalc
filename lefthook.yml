@@ -1,0 +1,7 @@
+# lefthook: costcalc (Kotlin/Android)
+# Kotlin リンタは現状未導入（後続 ISSUE で ktlint CLI 導入を検討）。
+# pre-push で CI と同等の Android ユニットテストを実行し、push 前の最終ゲートとする。
+pre-push:
+  commands:
+    unit-test:
+      run: ./gradlew :app:testDebugUnitTest --no-daemon
