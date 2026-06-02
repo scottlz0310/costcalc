@@ -19,6 +19,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.shoptools.R
 import com.example.shoptools.design.ShopToolsTheme
@@ -28,6 +29,8 @@ import com.example.shoptools.feature.stamps.StampsViewModel
 import com.example.shoptools.feature.stamps.ui.StampsScreen
 import com.example.shoptools.feature.unitprice.UnitPriceViewModel
 import com.example.shoptools.feature.unitprice.ui.UnitPriceScreen
+import com.example.shoptools.feature.unitprice.ui.ocr.CameraOcrScreen
+import com.example.shoptools.feature.unitprice.ui.ocr.OcrViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 sealed class Screen(
@@ -41,6 +44,9 @@ sealed class Screen(
 
     object Settings : Screen("settings", R.string.tab_settings, Icons.Filled.Settings)
 }
+
+private const val UNIT_PRICE_GRAPH = "unit_price_graph"
+private const val ROUTE_OCR = "unit_price_ocr/{rowId}"
 
 private val bottomNavItems = listOf(Screen.UnitPrice, Screen.Stamps, Screen.Settings)
 
@@ -62,43 +68,71 @@ class MainActivity : ComponentActivity() {
 private fun MainScaffold() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
+    val currentRoute = navBackStackEntry?.destination?.route
+    val showBottomBar = currentRoute != ROUTE_OCR
 
     Scaffold(
         bottomBar = {
-            NavigationBar {
-                bottomNavItems.forEach { screen ->
-                    NavigationBarItem(
-                        icon = {
-                            Icon(
-                                imageVector = screen.icon,
-                                contentDescription = stringResource(screen.labelRes),
-                            )
-                        },
-                        label = { Text(stringResource(screen.labelRes)) },
-                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                        onClick = {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+            if (showBottomBar) {
+                NavigationBar {
+                    bottomNavItems.forEach { screen ->
+                        NavigationBarItem(
+                            icon = {
+                                Icon(
+                                    imageVector = screen.icon,
+                                    contentDescription = stringResource(screen.labelRes),
+                                )
+                            },
+                            label = { Text(stringResource(screen.labelRes)) },
+                            selected = navBackStackEntry?.destination?.hierarchy
+                                ?.any { it.route == screen.route } == true,
+                            onClick = {
+                                navController.navigate(screen.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                    )
+                            },
+                        )
+                    }
                 }
             }
         },
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.UnitPrice.route,
+            startDestination = UNIT_PRICE_GRAPH,
             modifier = Modifier.padding(innerPadding),
         ) {
-            composable(Screen.UnitPrice.route) {
-                val vm: UnitPriceViewModel = hiltViewModel()
-                UnitPriceScreen(viewModel = vm)
+            navigation(startDestination = Screen.UnitPrice.route, route = UNIT_PRICE_GRAPH) {
+                composable(Screen.UnitPrice.route) { backStackEntry ->
+                    val parentEntry = remember(backStackEntry) {
+                        navController.getBackStackEntry(UNIT_PRICE_GRAPH)
+                    }
+                    val vm: UnitPriceViewModel = hiltViewModel(parentEntry)
+                    UnitPriceScreen(
+                        viewModel = vm,
+                        onOpenCamera = { rowId ->
+                            navController.navigate("unit_price_ocr/$rowId")
+                        },
+                    )
+                }
+                composable(ROUTE_OCR) { backStackEntry ->
+                    val rowId = backStackEntry.arguments?.getString("rowId") ?: return@composable
+                    val parentEntry = remember(backStackEntry) {
+                        navController.getBackStackEntry(UNIT_PRICE_GRAPH)
+                    }
+                    val unitPriceVm: UnitPriceViewModel = hiltViewModel(parentEntry)
+                    val ocrVm: OcrViewModel = hiltViewModel()
+                    CameraOcrScreen(
+                        rowId = rowId,
+                        unitPriceViewModel = unitPriceVm,
+                        ocrViewModel = ocrVm,
+                        onDismiss = { navController.popBackStack() },
+                    )
+                }
             }
             composable(Screen.Stamps.route) {
                 val vm: StampsViewModel = hiltViewModel()

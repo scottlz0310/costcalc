@@ -5,6 +5,23 @@
 
 ---
 
+## [Unreleased] - 2026-06-02
+
+### 追加
+- 単価比較：カメラ OCR によるフィールド自動入力（AR タップ方式）(#35)
+  - `ProductRowEditor` に「カメラで入力」ボタンを追加
+  - CameraX + ML Kit Text Recognition Japanese（オフライン）で値札をリアルタイム認識
+  - ステップ式 UI（① 価格 → ② 内容量＋単位 → ③ 入数）で候補チップをタップして確定
+  - confidence 0.5 以上を候補表示、0.75 以上を強調（黄色ボーダー）
+  - 価格候補スコアリング（周辺語 ¥/円/税込、画面中央付近を加点）
+  - ② パース失敗時はエラーメッセージを表示し手入力を促す
+  - 「最初から」「スキップ」「閉じる」でミスリカバリー、閉じると手入力値を保持
+  - `UnitPriceViewModel` を NavGraph スコープで共有（Activity-scoped 昇格なし）
+  - `TextParser`（純粋ロジック）の JUnit テスト 19 ケースを追加
+- Android SDK セットアップ手順を README.md に追加（Android Studio なし・cmdline-tools のみでビルド可能）
+
+---
+
 ## [Unreleased] - 2026-05-30
 
 ### 追加

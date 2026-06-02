@@ -57,6 +57,14 @@ sealed class UnitPriceEvent {
     data class ClearRow(
         val id: String,
     ) : UnitPriceEvent()
+
+    data class ApplyOcrResult(
+        val rowId: String,
+        val price: String,
+        val quantity: String,
+        val unit: String,
+        val count: String,
+    ) : UnitPriceEvent()
 }
 
 @HiltViewModel
@@ -81,6 +89,7 @@ class UnitPriceViewModel
                 is UnitPriceEvent.UpdateRow -> updateRow(event.row)
                 is UnitPriceEvent.RemoveRow -> removeRow(event.id)
                 is UnitPriceEvent.ClearRow -> clearRow(event.id)
+                is UnitPriceEvent.ApplyOcrResult -> applyOcrResult(event)
             }
         }
 
@@ -144,6 +153,24 @@ class UnitPriceViewModel
                     }
                 }
             return row.copy(priceError = priceErr, quantityError = quantityErr, countError = countErr)
+        }
+
+        private fun applyOcrResult(event: UnitPriceEvent.ApplyOcrResult) {
+            _uiState.update { state ->
+                val rows = state.rows.map { row ->
+                    if (row.id != event.rowId) return@map row
+                    validated(
+                        row.copy(
+                            price = event.price.ifBlank { row.price },
+                            quantity = event.quantity.ifBlank { row.quantity },
+                            unit = event.unit.ifBlank { row.unit },
+                            count = event.count.ifBlank { row.count },
+                        ),
+                    )
+                }
+                state.copy(rows = rows)
+            }
+            recalculate()
         }
 
         private fun recalculate() {
