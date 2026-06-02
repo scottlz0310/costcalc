@@ -5,6 +5,15 @@
 
 ---
 
+## [Unreleased] - 2026-06-02 (2)
+
+### 変更
+- `hiltViewModel` を `hilt-lifecycle-viewmodel-compose:1.3.0` の新パッケージに移行 (#37)
+  - `androidx.hilt.navigation.compose.hiltViewModel` → `androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel`
+  - `MainActivity.kt` の deprecated 警告を解消
+
+---
+
 ## [Unreleased] - 2026-06-02
 
 ### 追加
