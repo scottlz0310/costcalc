@@ -230,10 +230,8 @@ class StampsViewModel
             // Validate all rows
             val hasRowErrors =
                 state.rows.any { row ->
-                    row.denomination.isNotBlank() &&
-                        validateDenomination(row.denomination).let { !it.isValid } ||
-                        row.stock.isNotBlank() &&
-                        validateStock(row.stock).let { !it.isValid }
+                    (row.denomination.isNotBlank() && validateDenomination(row.denomination).let { !it.isValid }) ||
+                        (row.stock.isNotBlank() && validateStock(row.stock).let { !it.isValid })
                 }
             if (hasRowErrors) return
 

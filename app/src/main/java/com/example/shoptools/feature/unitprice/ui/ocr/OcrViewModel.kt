@@ -101,6 +101,7 @@ class OcrViewModel
                         )
                     }
                 }
+
                 OcrStep.QUANTITY -> {
                     val parsed = TextParser.parseQuantity(candidate.text)
                     if (parsed != null) {
@@ -123,6 +124,7 @@ class OcrViewModel
                         }
                     }
                 }
+
                 OcrStep.COUNT -> {
                     accumulator.reset()
                     _uiState.update {

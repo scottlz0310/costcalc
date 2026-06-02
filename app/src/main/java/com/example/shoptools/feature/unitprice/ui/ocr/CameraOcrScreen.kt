@@ -208,7 +208,7 @@ private fun CameraPreviewWithOverlay(
                                                             }
                                                         val rawCandidates =
                                                             when (currentStep) {
-                                                                OcrStep.PRICE ->
+                                                                OcrStep.PRICE -> {
                                                                     TextParser.extractPriceCandidates(
                                                                         blocks,
                                                                         android.graphics.Rect(
@@ -218,15 +218,20 @@ private fun CameraPreviewWithOverlay(
                                                                             capturedHeight,
                                                                         ),
                                                                     )
-                                                                OcrStep.QUANTITY ->
+                                                                }
+
+                                                                OcrStep.QUANTITY -> {
                                                                     TextParser
                                                                         .extractQuantityCandidates(
                                                                             blocks,
                                                                         )
-                                                                OcrStep.COUNT ->
+                                                                }
+
+                                                                OcrStep.COUNT -> {
                                                                     TextParser.extractCountCandidates(
                                                                         blocks,
                                                                     )
+                                                                }
                                                             }
                                                         val viewTransform = previewView.outputTransform
                                                         val mappedCandidates =

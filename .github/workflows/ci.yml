@@ -49,7 +49,7 @@ jobs:
       - name: ktlint をインストール
         env:
           # renovate: datasource=github-releases depName=pinterest/ktlint
-          KTLINT_VERSION: "1.5.0"
+          KTLINT_VERSION: "1.8.0"
         run: |
           curl -sSLO "https://github.com/pinterest/ktlint/releases/download/${KTLINT_VERSION}/ktlint"
           chmod a+x ktlint
