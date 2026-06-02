@@ -41,7 +41,11 @@ data class OcrUiState(
 )
 
 sealed interface OcrEvent {
-    data class CandidateTapped(val candidate: OcrCandidate) : OcrEvent
+    data class CandidateTapped(
+        val candidate: OcrCandidate,
+    ) : OcrEvent
+
     object SkipStep : OcrEvent
+
     object Reset : OcrEvent
 }

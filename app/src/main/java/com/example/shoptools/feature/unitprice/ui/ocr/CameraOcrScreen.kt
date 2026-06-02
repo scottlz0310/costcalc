@@ -7,6 +7,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
@@ -56,9 +58,10 @@ fun CameraOcrScreen(
                 PackageManager.PERMISSION_GRANTED,
         )
     }
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission(),
-    ) { granted -> hasCameraPermission = granted }
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) { granted -> hasCameraPermission = granted }
 
     val uiState by ocrViewModel.uiState.collectAsState()
 
@@ -100,10 +103,11 @@ fun CameraOcrScreen(
                 Text(
                     text = uiState.parseError,
                     color = Color.Yellow,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xAA000000))
-                        .padding(12.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(Color(0xAA000000))
+                            .padding(12.dp),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
@@ -125,9 +129,10 @@ private fun CameraPreviewWithOverlay(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val executor = remember { Executors.newSingleThreadExecutor() }
-    val recognizer = remember {
-        TextRecognition.getClient(JapaneseTextRecognizerOptions.Builder().build())
-    }
+    val recognizer =
+        remember {
+            TextRecognition.getClient(JapaneseTextRecognizerOptions.Builder().build())
+        }
     val textMeasurer = rememberTextMeasurer()
     // candidates は OCR フレームごとに更新されるが、pointerInput は Unit キーで安定させ
     // タップ時点の最新値を rememberUpdatedState 経由で読む。
@@ -143,107 +148,139 @@ private fun CameraPreviewWithOverlay(
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
             factory = { ctx ->
-                PreviewView(ctx).apply {
-                    // getOutputTransform() は COMPATIBLE mode（TextureView）で正確に動作する
-                    implementationMode = PreviewView.ImplementationMode.COMPATIBLE
-                }.also { previewView ->
-                    val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
-                    cameraProviderFuture.addListener({
-                        val cameraProvider = cameraProviderFuture.get()
-                        val preview = Preview.Builder().build().also {
-                            it.setSurfaceProvider(previewView.surfaceProvider)
-                        }
-                        val imageAnalysis = ImageAnalysis.Builder()
-                            .setResolutionSelector(
-                                androidx.camera.core.resolutionselector.ResolutionSelector.Builder()
-                                    .setAspectRatioStrategy(
-                                        androidx.camera.core.resolutionselector.AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY,
-                                    )
-                                    .build(),
-                            )
-                            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                            .build()
-                            .also { analysis ->
-                                analysis.setAnalyzer(executor) { imageProxy ->
-                                    val mediaImage = imageProxy.image
-                                    if (mediaImage != null) {
-                                        // imageProxy がオープンなアナライザースレッドで InputTransform を取得する。
-                                        // addOnSuccessListener（メインスレッド）では imageProxy の有効性が保証されないため事前取得が必要。
-                                        val inputTransform = OcrCoordinateMapper.getInputTransform(imageProxy)
-                                        val capturedWidth = imageProxy.width
-                                        val capturedHeight = imageProxy.height
-                                        val image = InputImage.fromMediaImage(
-                                            mediaImage,
-                                            imageProxy.imageInfo.rotationDegrees,
-                                        )
-                                        val currentStep = ocrViewModel.uiState.value.currentStep
-                                        recognizer.process(image)
-                                            .addOnSuccessListener { result ->
-                                                // メインスレッド — previewView.outputTransform を直接取得することで
-                                                // recomposition タイミングに依存せず常に最新の変換を得る。
-                                                val blocks = result.textBlocks.map { block ->
-                                                    val confidence = block.lines
-                                                        .flatMap { it.elements }
-                                                        .mapNotNull { it.confidence }
-                                                        .let { cs ->
-                                                            if (cs.isEmpty()) 0.5f
-                                                            else cs.average().toFloat()
-                                                        }
-                                                    TextBlock(block.text, confidence, block.boundingBox)
-                                                }
-                                                val rawCandidates = when (currentStep) {
-                                                    OcrStep.PRICE -> TextParser.extractPriceCandidates(
-                                                        blocks,
-                                                        android.graphics.Rect(0, 0, capturedWidth, capturedHeight),
-                                                    )
-                                                    OcrStep.QUANTITY -> TextParser.extractQuantityCandidates(blocks)
-                                                    OcrStep.COUNT -> TextParser.extractCountCandidates(blocks)
-                                                }
-                                                val viewTransform = previewView.outputTransform
-                                                val mappedCandidates = OcrCoordinateMapper.mapCandidates(
-                                                    rawCandidates,
-                                                    inputTransform,
-                                                    viewTransform,
-                                                )
-                                                ocrViewModel.onCandidatesDetected(
-                                                    mappedCandidates,
-                                                    capturedWidth,
-                                                    capturedHeight,
-                                                )
-                                            }
-                                            .addOnCompleteListener { imageProxy.close() }
-                                    } else {
-                                        imageProxy.close()
-                                    }
+                PreviewView(ctx)
+                    .apply {
+                        // getOutputTransform() は COMPATIBLE mode（TextureView）で正確に動作する
+                        implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+                    }.also { previewView ->
+                        val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
+                        cameraProviderFuture.addListener({
+                            val cameraProvider = cameraProviderFuture.get()
+                            val preview =
+                                Preview.Builder().build().also {
+                                    it.setSurfaceProvider(previewView.surfaceProvider)
                                 }
+                            val imageAnalysis =
+                                ImageAnalysis
+                                    .Builder()
+                                    .setResolutionSelector(
+                                        ResolutionSelector
+                                            .Builder()
+                                            .setAspectRatioStrategy(
+                                                AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY,
+                                            ).build(),
+                                    ).setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                                    .build()
+                                    .also { analysis ->
+                                        analysis.setAnalyzer(executor) { imageProxy ->
+                                            val mediaImage = imageProxy.image
+                                            if (mediaImage != null) {
+                                                // imageProxy がオープンなアナライザースレッドで InputTransform を取得する。
+                                                // addOnSuccessListener（メインスレッド）では imageProxy の有効性が保証されないため事前取得が必要。
+                                                val inputTransform = OcrCoordinateMapper.getInputTransform(imageProxy)
+                                                val capturedWidth = imageProxy.width
+                                                val capturedHeight = imageProxy.height
+                                                val image =
+                                                    InputImage.fromMediaImage(
+                                                        mediaImage,
+                                                        imageProxy.imageInfo.rotationDegrees,
+                                                    )
+                                                val currentStep = ocrViewModel.uiState.value.currentStep
+                                                recognizer
+                                                    .process(image)
+                                                    .addOnSuccessListener { result ->
+                                                        // メインスレッド — previewView.outputTransform を直接取得することで
+                                                        // recomposition タイミングに依存せず常に最新の変換を得る。
+                                                        val blocks =
+                                                            result.textBlocks.map { block ->
+                                                                val confidence =
+                                                                    block.lines
+                                                                        .flatMap { it.elements }
+                                                                        .mapNotNull { it.confidence }
+                                                                        .let { cs ->
+                                                                            if (cs.isEmpty()) {
+                                                                                0.5f
+                                                                            } else {
+                                                                                cs.average().toFloat()
+                                                                            }
+                                                                        }
+                                                                TextBlock(block.text, confidence, block.boundingBox)
+                                                            }
+                                                        val rawCandidates =
+                                                            when (currentStep) {
+                                                                OcrStep.PRICE -> {
+                                                                    TextParser.extractPriceCandidates(
+                                                                        blocks,
+                                                                        android.graphics.Rect(
+                                                                            0,
+                                                                            0,
+                                                                            capturedWidth,
+                                                                            capturedHeight,
+                                                                        ),
+                                                                    )
+                                                                }
+
+                                                                OcrStep.QUANTITY -> {
+                                                                    TextParser
+                                                                        .extractQuantityCandidates(
+                                                                            blocks,
+                                                                        )
+                                                                }
+
+                                                                OcrStep.COUNT -> {
+                                                                    TextParser.extractCountCandidates(
+                                                                        blocks,
+                                                                    )
+                                                                }
+                                                            }
+                                                        val viewTransform = previewView.outputTransform
+                                                        val mappedCandidates =
+                                                            OcrCoordinateMapper.mapCandidates(
+                                                                rawCandidates,
+                                                                inputTransform,
+                                                                viewTransform,
+                                                            )
+                                                        ocrViewModel.onCandidatesDetected(
+                                                            mappedCandidates,
+                                                            capturedWidth,
+                                                            capturedHeight,
+                                                        )
+                                                    }.addOnCompleteListener { imageProxy.close() }
+                                            } else {
+                                                imageProxy.close()
+                                            }
+                                        }
+                                    }
+                            try {
+                                cameraProvider.unbindAll()
+                                cameraProvider.bindToLifecycle(
+                                    lifecycleOwner,
+                                    CameraSelector.DEFAULT_BACK_CAMERA,
+                                    preview,
+                                    imageAnalysis,
+                                )
+                            } catch (_: Exception) {
                             }
-                        try {
-                            cameraProvider.unbindAll()
-                            cameraProvider.bindToLifecycle(
-                                lifecycleOwner,
-                                CameraSelector.DEFAULT_BACK_CAMERA,
-                                preview,
-                                imageAnalysis,
-                            )
-                        } catch (_: Exception) {}
-                    }, ContextCompat.getMainExecutor(ctx))
-                }
+                        }, ContextCompat.getMainExecutor(ctx))
+                    }
             },
             modifier = Modifier.fillMaxSize(),
         )
 
         // AR オーバーレイ: バウンディングボックス + テキストチップ
         Canvas(
-            modifier = Modifier
-                .fillMaxSize()
-                .pointerInput(Unit) {
-                    detectTapGestures { offset ->
-                        val tapped = currentCandidates.firstOrNull { candidate ->
-                            candidate.boundingBoxView?.contains(offset.x, offset.y) == true
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset ->
+                            val tapped =
+                                currentCandidates.firstOrNull { candidate ->
+                                    candidate.boundingBoxView?.contains(offset.x, offset.y) == true
+                                }
+                            tapped?.let { ocrViewModel.onEvent(OcrEvent.CandidateTapped(it)) }
                         }
-                        tapped?.let { ocrViewModel.onEvent(OcrEvent.CandidateTapped(it)) }
-                    }
-                },
+                    },
         ) {
             candidates.forEach { candidate ->
                 val rect = candidate.boundingBoxView ?: return@forEach
@@ -265,14 +302,16 @@ private fun CameraPreviewWithOverlay(
                     style = Stroke(width = if (isHigh) 3f else 1.5f),
                 )
                 // テキストラベル
-                val textLayout = textMeasurer.measure(
-                    candidate.text,
-                    style = TextStyle(
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = if (isHigh) FontWeight.Bold else FontWeight.Normal,
-                    ),
-                )
+                val textLayout =
+                    textMeasurer.measure(
+                        candidate.text,
+                        style =
+                            TextStyle(
+                                color = Color.White,
+                                fontSize = 14.sp,
+                                fontWeight = if (isHigh) FontWeight.Bold else FontWeight.Normal,
+                            ),
+                    )
                 val labelX = rect.left.coerceAtLeast(0f)
                 val labelY = (rect.top - textLayout.size.height).coerceAtLeast(0f)
                 drawRect(
@@ -287,11 +326,15 @@ private fun CameraPreviewWithOverlay(
 }
 
 @Composable
-private fun StepIndicator(step: OcrStep, modifier: Modifier = Modifier) {
+private fun StepIndicator(
+    step: OcrStep,
+    modifier: Modifier = Modifier,
+) {
     Row(
-        modifier = modifier
-            .background(Color(0xBB000000))
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier =
+            modifier
+                .background(Color(0xBB000000))
+                .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -302,16 +345,18 @@ private fun StepIndicator(step: OcrStep, modifier: Modifier = Modifier) {
         ).forEach { (s, label) ->
             Text(
                 text = label,
-                color = when {
-                    s == step -> Color.Yellow
-                    s.ordinal < step.ordinal -> Color(0xFF88FF88)
-                    else -> Color(0x88FFFFFF)
-                },
-                style = if (s == step) {
-                    MaterialTheme.typography.titleSmall
-                } else {
-                    MaterialTheme.typography.bodySmall
-                },
+                color =
+                    when {
+                        s == step -> Color.Yellow
+                        s.ordinal < step.ordinal -> Color(0xFF88FF88)
+                        else -> Color(0x88FFFFFF)
+                    },
+                style =
+                    if (s == step) {
+                        MaterialTheme.typography.titleSmall
+                    } else {
+                        MaterialTheme.typography.bodySmall
+                    },
             )
         }
     }
@@ -325,10 +370,11 @@ private fun BottomControls(
     onDismiss: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xBB000000))
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(Color(0xBB000000))
+                .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {

@@ -5,7 +5,6 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 class TextParserTest {
-
     // --- parseQuantity ---
 
     @Test
@@ -82,20 +81,22 @@ class TextParserTest {
     @Test
     fun `extractPriceCandidates - prefers blocks with yen context when confidence is similar`() {
         // "¥198": 0.6 + 3*0.05 = 0.75  vs  "500": 0.65 → ¥コンテキストで逆転することを確認
-        val blocks = listOf(
-            TextBlock("¥198", 0.6f, null),
-            TextBlock("500", 0.65f, null),
-        )
+        val blocks =
+            listOf(
+                TextBlock("¥198", 0.6f, null),
+                TextBlock("500", 0.65f, null),
+            )
         val candidates = TextParser.extractPriceCandidates(blocks, null)
         assertEquals("198", candidates.first().text)
     }
 
     @Test
     fun `extractPriceCandidates - excludes values with unit suffix`() {
-        val blocks = listOf(
-            TextBlock("500g", 0.9f, null),
-            TextBlock("¥298", 0.7f, null),
-        )
+        val blocks =
+            listOf(
+                TextBlock("500g", 0.9f, null),
+                TextBlock("¥298", 0.7f, null),
+            )
         val candidates = TextParser.extractPriceCandidates(blocks, null)
         assertEquals(1, candidates.size)
         assertEquals("298", candidates.first().text)
@@ -117,11 +118,12 @@ class TextParserTest {
 
     @Test
     fun `extractPriceCandidates - excludes out of range values`() {
-        val blocks = listOf(
-            TextBlock("0", 0.9f, null),
-            TextBlock("9999999", 0.9f, null),
-            TextBlock("100", 0.7f, null),
-        )
+        val blocks =
+            listOf(
+                TextBlock("0", 0.9f, null),
+                TextBlock("9999999", 0.9f, null),
+                TextBlock("100", 0.7f, null),
+            )
         val candidates = TextParser.extractPriceCandidates(blocks, null)
         assertEquals(1, candidates.size)
         assertEquals("100", candidates.first().text)

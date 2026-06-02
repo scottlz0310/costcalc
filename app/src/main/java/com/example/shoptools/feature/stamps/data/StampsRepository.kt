@@ -25,14 +25,14 @@ class StampsRepository
     constructor(
         @ApplicationContext private val context: Context,
     ) {
-        private val ROWS_KEY = stringPreferencesKey("stamps_rows")
-        private val TARGET_KEY = stringPreferencesKey("stamps_target")
+        private val rowsKey = stringPreferencesKey("stamps_rows")
+        private val targetKey = stringPreferencesKey("stamps_target")
 
         val stampsFlow: Flow<PersistedStampsData> =
             context.stampsDataStore.data.map { prefs ->
                 PersistedStampsData(
-                    rows = decodeRows(prefs[ROWS_KEY] ?: ""),
-                    target = prefs[TARGET_KEY] ?: "",
+                    rows = decodeRows(prefs[rowsKey] ?: ""),
+                    target = prefs[targetKey] ?: "",
                 )
             }
 
@@ -41,8 +41,8 @@ class StampsRepository
             target: String,
         ) {
             context.stampsDataStore.edit { prefs ->
-                prefs[ROWS_KEY] = encodeRows(rows)
-                prefs[TARGET_KEY] = target
+                prefs[rowsKey] = encodeRows(rows)
+                prefs[targetKey] = target
             }
         }
 

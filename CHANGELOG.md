@@ -5,6 +5,13 @@
 
 ---
 
+## [1.1.1] - 2026-06-02
+
+### 変更
+- CI ワークフローを整備: `ci.yml`（全ブランチ push + PR → テスト + ktlint）と `release.yml`（main push → debug APK、タグ push → release APK + GitHub Release draft）に分離
+
+---
+
 ## [1.1.0] - 2026-06-02
 
 ### 追加
