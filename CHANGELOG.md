@@ -63,3 +63,8 @@
 
 <!-- 次のリリースはここに追加 -->
 <!-- ## [1.2.0] - YYYY-MM-DD -->
+
+## [Unreleased]
+
+### 変更
+- CI ワークフローを整備: `ci.yml`（全ブランチ push + PR → テスト + ktlint）と `release.yml`（main push → debug APK、タグ push → release APK + GitHub Release draft）に分離
