@@ -2,7 +2,6 @@ package com.example.shoptools.feature.unitprice.ui.ocr
 
 import android.graphics.RectF
 import androidx.camera.core.ImageProxy
-import androidx.camera.view.PreviewView
 import androidx.camera.view.transform.CoordinateTransform
 import androidx.camera.view.transform.ImageProxyTransformFactory
 import androidx.camera.view.transform.OutputTransform
@@ -21,19 +20,25 @@ object OcrCoordinateMapper {
     }
 
     /**
-     * ImageProxy の画像座標で表された候補リストに、PreviewView の表示座標系へ
-     * マッピングした [OcrRectF] を付与して返す。
+     * ImageProxy がオープンなアナライザースレッドで呼び出すこと。
+     * ML Kit の非同期処理に入る前に取得しておく必要がある。
+     */
+    fun getInputTransform(imageProxy: ImageProxy): OutputTransform =
+        transformFactory.getOutputTransform(imageProxy)
+
+    /**
+     * [inputTransform]: アナライザースレッドで事前取得した ImageProxy の変換。
+     * [viewTransform]: PreviewView の OutputTransform（メインスレッドで取得、null 可）。
      *
-     * [viewTransform] が null の場合（PreviewView 未準備）は boundingBoxView を null のまま返す。
+     * [viewTransform] が null の場合は boundingBoxView を null のまま返す。
      * null の候補は Canvas 描画時にスキップされ、次フレームで再試行される。
      */
     fun mapCandidates(
         candidates: List<OcrCandidate>,
-        imageProxy: ImageProxy,
+        inputTransform: OutputTransform,
         viewTransform: OutputTransform?,
     ): List<OcrCandidate> {
         viewTransform ?: return candidates
-        val inputTransform = transformFactory.getOutputTransform(imageProxy)
         val coordinateTransform = CoordinateTransform(inputTransform, viewTransform)
         return candidates.map { candidate ->
             val viewRect = candidate.boundingBox?.let { rect ->
@@ -44,7 +49,4 @@ object OcrCoordinateMapper {
             candidate.copy(boundingBoxView = viewRect)
         }
     }
-
-    /** PreviewView から OutputTransform を取得する（メインスレッドで呼ぶこと）。 */
-    fun getViewTransform(previewView: PreviewView): OutputTransform? = previewView.outputTransform
 }

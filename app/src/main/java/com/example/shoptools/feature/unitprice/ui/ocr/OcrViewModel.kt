@@ -59,10 +59,17 @@ class OcrViewModel @Inject constructor() : ViewModel() {
             .filter { it.meetsThreshold }
             .associate { candidate ->
                 val normalizedText = candidate.text.trim().lowercase().replace(",", "")
-                val bucket = candidate.boundingBox
-                    ?.toOcrRect()
-                    ?.regionBucket(imageWidth, imageHeight)
-                    ?: 0
+                // PRICE のみ位置区別が必要（同一数値が複数箇所に存在しうる）。
+                // QUANTITY / COUNT は 1 ラベルに 1 つのみ存在するため bucket=0 固定とし、
+                // カメラのわずかな揺れで CandidateKey が変わりスコアが分散するのを防ぐ。
+                val bucket = if (step == OcrStep.PRICE) {
+                    candidate.boundingBox
+                        ?.toOcrRect()
+                        ?.regionBucket(imageWidth, imageHeight)
+                        ?: 0
+                } else {
+                    0
+                }
                 val key = CandidateKey(step, normalizedText, bucket)
                 val entry = OcrScoreAccumulator.Entry(
                     text = candidate.text,

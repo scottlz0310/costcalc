@@ -9,12 +9,10 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.camera.view.transform.OutputTransform
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Refresh
@@ -43,7 +41,6 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
 import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicReference
 
 @Composable
 fun CameraOcrScreen(
@@ -131,8 +128,10 @@ private fun CameraPreviewWithOverlay(
     val recognizer = remember {
         TextRecognition.getClient(JapaneseTextRecognizerOptions.Builder().build())
     }
-    val viewTransformRef = remember { AtomicReference<OutputTransform?>(null) }
     val textMeasurer = rememberTextMeasurer()
+    // candidates は OCR フレームごとに更新されるが、pointerInput は Unit キーで安定させ
+    // タップ時点の最新値を rememberUpdatedState 経由で読む。
+    val currentCandidates by rememberUpdatedState(candidates)
 
     DisposableEffect(Unit) {
         onDispose {
@@ -168,6 +167,11 @@ private fun CameraPreviewWithOverlay(
                                 analysis.setAnalyzer(executor) { imageProxy ->
                                     val mediaImage = imageProxy.image
                                     if (mediaImage != null) {
+                                        // imageProxy がオープンなアナライザースレッドで InputTransform を取得する。
+                                        // addOnSuccessListener（メインスレッド）では imageProxy の有効性が保証されないため事前取得が必要。
+                                        val inputTransform = OcrCoordinateMapper.getInputTransform(imageProxy)
+                                        val capturedWidth = imageProxy.width
+                                        val capturedHeight = imageProxy.height
                                         val image = InputImage.fromMediaImage(
                                             mediaImage,
                                             imageProxy.imageInfo.rotationDegrees,
@@ -175,7 +179,8 @@ private fun CameraPreviewWithOverlay(
                                         val currentStep = ocrViewModel.uiState.value.currentStep
                                         recognizer.process(image)
                                             .addOnSuccessListener { result ->
-                                                // メインスレッド — viewTransform を取得して座標変換
+                                                // メインスレッド — previewView.outputTransform を直接取得することで
+                                                // recomposition タイミングに依存せず常に最新の変換を得る。
                                                 val blocks = result.textBlocks.map { block ->
                                                     val confidence = block.lines
                                                         .flatMap { it.elements }
@@ -189,21 +194,21 @@ private fun CameraPreviewWithOverlay(
                                                 val rawCandidates = when (currentStep) {
                                                     OcrStep.PRICE -> TextParser.extractPriceCandidates(
                                                         blocks,
-                                                        android.graphics.Rect(0, 0, imageProxy.width, imageProxy.height),
+                                                        android.graphics.Rect(0, 0, capturedWidth, capturedHeight),
                                                     )
                                                     OcrStep.QUANTITY -> TextParser.extractQuantityCandidates(blocks)
                                                     OcrStep.COUNT -> TextParser.extractCountCandidates(blocks)
                                                 }
-                                                val viewTransform = viewTransformRef.get()
+                                                val viewTransform = previewView.outputTransform
                                                 val mappedCandidates = OcrCoordinateMapper.mapCandidates(
                                                     rawCandidates,
-                                                    imageProxy,
+                                                    inputTransform,
                                                     viewTransform,
                                                 )
                                                 ocrViewModel.onCandidatesDetected(
                                                     mappedCandidates,
-                                                    imageProxy.width,
-                                                    imageProxy.height,
+                                                    capturedWidth,
+                                                    capturedHeight,
                                                 )
                                             }
                                             .addOnCompleteListener { imageProxy.close() }
@@ -224,10 +229,6 @@ private fun CameraPreviewWithOverlay(
                     }, ContextCompat.getMainExecutor(ctx))
                 }
             },
-            update = { previewView ->
-                // メインスレッドで outputTransform を更新
-                viewTransformRef.set(OcrCoordinateMapper.getViewTransform(previewView))
-            },
             modifier = Modifier.fillMaxSize(),
         )
 
@@ -235,9 +236,9 @@ private fun CameraPreviewWithOverlay(
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .pointerInput(candidates) {
+                .pointerInput(Unit) {
                     detectTapGestures { offset ->
-                        val tapped = candidates.firstOrNull { candidate ->
+                        val tapped = currentCandidates.firstOrNull { candidate ->
                             candidate.boundingBoxView?.contains(offset.x, offset.y) == true
                         }
                         tapped?.let { ocrViewModel.onEvent(OcrEvent.CandidateTapped(it)) }

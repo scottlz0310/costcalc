@@ -5,6 +5,17 @@
 
 ---
 
+## [Unreleased] - 2026-06-02 (4)
+
+### 修正
+- AR オーバーレイ: `pointerInput(candidates)` を `pointerInput(Unit)` + `rememberUpdatedState` に変更し、OCR フレーム更新によるジェスチャー検出コルーチン再起動でタップが消失するバグを修正
+- AR オーバーレイ: `viewTransformRef` (AtomicReference) を廃止し、アナライザースレッドで `inputTransform` を取得・メインスレッドで `previewView.outputTransform` を直接参照する方式に変更（StateFlow 等値チェックによる recomposition スキップで変換が null 固定になるバグを修正）
+- AR オーバーレイ: QUANTITY/COUNT ステップの `regionBucket=0` 固定化でカメラ微動による `CandidateKey` 分散を解消
+- `TextParser`: 価格候補抽出時に直前文字が ASCII 英字またはドットの場合を除外し、`900m2` → `2` 等の OCR ノイズ偽陽性を低減
+- `TextParser`: `QUANTITY_REGEX` を IGNORE_CASE 化し `QUANTITY_REGEX_NOISY_ML` を追加（`㎖` が `m2`/`m!`/`m&` 等に誤読された場合の noisy fallback）、`OCR_O_FOR_ZERO` で `O→0` 補正
+
+---
+
 ## [Unreleased] - 2026-06-02 (3)
 
 ### 変更
