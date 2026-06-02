@@ -2,10 +2,17 @@ package com.example.shoptools.feature.unitprice.ui.ocr
 
 import android.graphics.Rect
 
+data class CandidateKey(
+    val step: OcrStep,
+    val normalizedText: String,
+    val regionBucket: Int,
+)
+
 data class OcrCandidate(
     val text: String,
     val confidence: Float,
     val boundingBox: Rect?,
+    val boundingBoxView: OcrRectF? = null,
 ) {
     val isHighConfidence: Boolean get() = confidence >= 0.75f
     val meetsThreshold: Boolean get() = confidence >= 0.5f

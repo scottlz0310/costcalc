@@ -5,6 +5,20 @@
 
 ---
 
+## [Unreleased] - 2026-06-02 (3)
+
+### 変更
+- カメラ OCR を真の AR オーバーレイ実装に刷新 (#39)
+  - `LazyRow` チップを廃止し、値札上のバウンディングボックスに半透明チップを Canvas 描画
+  - `OcrScoreAccumulator`（Android 非依存）: フレーム横断スコア収束ロジック（検出→加算、非検出→減衰、閾値未満→削除）
+  - `OcrCoordinateMapper`: `ImageProxyTransformFactory` + `PreviewView.getOutputTransform()` + `CoordinateTransform.mapRect()` で画像座標→View座標変換
+  - `OcrRect` / `OcrRectF`: プラットフォーム非依存の座標型（`OcrScoreAccumulator` が Android 非依存であるための基盤）
+  - `PreviewView.ImplementationMode.COMPATIBLE` に固定し座標変換の精度を確保
+  - `CandidateKey`（step + normalizedText + regionBucket）で同一候補を跨フレームで識別
+  - `OcrScoreAccumulatorTest`: 9 ケース追加（スコア蓄積・上限・減衰・削除・表示閾値・regionBucket・reset・ソート・正規化）
+
+---
+
 ## [Unreleased] - 2026-06-02 (2)
 
 ### 変更
