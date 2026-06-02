@@ -10,9 +10,10 @@ object TextParser {
         RegexOption.IGNORE_CASE,
     )
     // OCR ノイズ対応: ㎖ の ℓ 部分が 2/!/& 等に誤読される場合のフォールバック。
-    // 3桁以上の数値 + m/n（n は m の誤読）+ 任意1文字（任意）にマッチ。
-    // 3桁未満を除外することで "1m" "5m" 等（距離）との衝突を回避する。
-    private val QUANTITY_REGEX_NOISY_ML = Regex("""(\d{3,}\.?\d*)\s*[mMnN][0-9ℓlL!&?1]?""")
+    // 3桁以上の数値 + m/n（n は m の誤読）+ ノイズ文字（任意）にマッチ。
+    // (?![a-zA-Z]) で後続が英字の場合（例: 500mg, 900mAh）を除外し、
+    // mL 以外の単位ブロックを誤って mL 候補に正規化しないよう防ぐ。
+    private val QUANTITY_REGEX_NOISY_ML = Regex("""(\d{3,}\.?\d*)\s*[mMnN][0-9ℓlL!&?1]?(?![a-zA-Z])""")
     // OCR 誤読補正: 数字列の末尾 O/o を数値文脈（後続が単位文字）のときに 0 へ置換
     // 例: "90Om" → "900m"
     private val OCR_O_FOR_ZERO = Regex("""(\d+)[Oo](?=[mMnNgGkKlL])""")
