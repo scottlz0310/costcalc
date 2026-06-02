@@ -102,6 +102,20 @@ class TextParserTest {
     }
 
     @Test
+    fun `extractPriceCandidates - keeps price when quantity appears in same OCR block on another line`() {
+        val blocks = listOf(TextBlock("税込198円\n500g", 0.8f, null))
+        val candidates = TextParser.extractPriceCandidates(blocks, null)
+        assertEquals("198", candidates.first().text)
+    }
+
+    @Test
+    fun `extractPriceCandidates - excludes only number directly followed by quantity unit`() {
+        val blocks = listOf(TextBlock("税込198円 500g", 0.8f, null))
+        val candidates = TextParser.extractPriceCandidates(blocks, null)
+        assertEquals(listOf("198"), candidates.map { it.text })
+    }
+
+    @Test
     fun `extractPriceCandidates - excludes out of range values`() {
         val blocks = listOf(
             TextBlock("0", 0.9f, null),

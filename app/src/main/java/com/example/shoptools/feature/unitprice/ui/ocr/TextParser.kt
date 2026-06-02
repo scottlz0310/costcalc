@@ -8,7 +8,9 @@ object TextParser {
     private val QUANTITY_REGEX = Regex("""(\d+\.?\d*)\s*(g|kg|mL|ml|L|l|個|本|枚|袋|缶|箱|pack|Pack)""")
 
     private val PRICE_CONTEXT_WORDS = setOf("¥", "円", "税込", "本体", "税抜", "price", "Price")
-    private val NEGATIVE_PRICE_WORDS = setOf("g", "kg", "mL", "ml", "L", "個", "本", "枚", "%", "℃")
+
+    // 数値直後にこれらが続く場合は価格ではなく内容量・単位とみなす
+    private val UNIT_SUFFIXES = listOf("kg", "mL", "ml", "個", "本", "枚", "袋", "缶", "箱", "g", "L", "l", "%", "℃")
 
     fun extractPriceCandidates(
         blocks: List<TextBlock>,
@@ -21,7 +23,9 @@ object TextParser {
                         val raw = match.value.replace(",", "")
                         val value = raw.toDoubleOrNull() ?: return@mapNotNull null
                         if (value < 1.0 || value > 999_999.0) return@mapNotNull null
-                        if (NEGATIVE_PRICE_WORDS.any { block.text.contains(it) }) return@mapNotNull null
+                        // block 全体ではなくマッチした数値直後のサフィックスで判定（複合ブロック対策）
+                        val textAfterMatch = block.text.substring(match.range.last + 1).trimStart()
+                        if (UNIT_SUFFIXES.any { textAfterMatch.startsWith(it) }) return@mapNotNull null
                         val score = scorePriceCandidate(block.text, block.boundingBox, imageBounds)
                         OcrCandidate(
                             text = raw,
