@@ -13,7 +13,12 @@ import androidx.camera.view.transform.OutputTransform
  */
 object OcrCoordinateMapper {
 
-    private val transformFactory = ImageProxyTransformFactory()
+    // setUsingRotationDegrees(true) で ImageProxy の rotation を変換に反映する。
+    // デフォルト false のままだと縦持ち端末（rotationDegrees=90/270）で
+    // ML Kit が返す bounding box が未回転バッファ座標として扱われ、AR チップがずれる。
+    private val transformFactory = ImageProxyTransformFactory().apply {
+        setUsingRotationDegrees(true)
+    }
 
     /**
      * ImageProxy の画像座標で表された候補リストに、PreviewView の表示座標系へ
