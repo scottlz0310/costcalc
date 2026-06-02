@@ -5,41 +5,7 @@
 
 ---
 
-## [Unreleased] - 2026-06-02 (4)
-
-### 修正
-- AR オーバーレイ: `pointerInput(candidates)` を `pointerInput(Unit)` + `rememberUpdatedState` に変更し、OCR フレーム更新によるジェスチャー検出コルーチン再起動でタップが消失するバグを修正
-- AR オーバーレイ: `viewTransformRef` (AtomicReference) を廃止し、アナライザースレッドで `inputTransform` を取得・メインスレッドで `previewView.outputTransform` を直接参照する方式に変更（StateFlow 等値チェックによる recomposition スキップで変換が null 固定になるバグを修正）
-- AR オーバーレイ: QUANTITY/COUNT ステップの `regionBucket=0` 固定化でカメラ微動による `CandidateKey` 分散を解消
-- `TextParser`: 価格候補抽出時に直前文字が ASCII 英字またはドットの場合を除外し、`900m2` → `2` 等の OCR ノイズ偽陽性を低減
-- `TextParser`: `QUANTITY_REGEX` を IGNORE_CASE 化し `QUANTITY_REGEX_NOISY_ML` を追加（`㎖` が `m2`/`m!`/`m&` 等に誤読された場合の noisy fallback）、`OCR_O_FOR_ZERO` で `O→0` 補正
-
----
-
-## [Unreleased] - 2026-06-02 (3)
-
-### 変更
-- カメラ OCR を真の AR オーバーレイ実装に刷新 (#39)
-  - `LazyRow` チップを廃止し、値札上のバウンディングボックスに半透明チップを Canvas 描画
-  - `OcrScoreAccumulator`（Android 非依存）: フレーム横断スコア収束ロジック（検出→加算、非検出→減衰、閾値未満→削除）
-  - `OcrCoordinateMapper`: `ImageProxyTransformFactory` + `PreviewView.getOutputTransform()` + `CoordinateTransform.mapRect()` で画像座標→View座標変換
-  - `OcrRect` / `OcrRectF`: プラットフォーム非依存の座標型（`OcrScoreAccumulator` が Android 非依存であるための基盤）
-  - `PreviewView.ImplementationMode.COMPATIBLE` に固定し座標変換の精度を確保
-  - `CandidateKey`（step + normalizedText + regionBucket）で同一候補を跨フレームで識別
-  - `OcrScoreAccumulatorTest`: 9 ケース追加（スコア蓄積・上限・減衰・削除・表示閾値・regionBucket・reset・ソート・正規化）
-
----
-
-## [Unreleased] - 2026-06-02 (2)
-
-### 変更
-- `hiltViewModel` を `hilt-lifecycle-viewmodel-compose:1.3.0` の新パッケージに移行 (#37)
-  - `androidx.hilt.navigation.compose.hiltViewModel` → `androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel`
-  - `MainActivity.kt` の deprecated 警告を解消
-
----
-
-## [Unreleased] - 2026-06-02
+## [1.1.0] - 2026-06-02
 
 ### 追加
 - 単価比較：カメラ OCR によるフィールド自動入力（AR タップ方式）(#35)
@@ -54,12 +20,27 @@
   - `TextParser`（純粋ロジック）の JUnit テスト 19 ケースを追加
 - Android SDK セットアップ手順を README.md に追加（Android Studio なし・cmdline-tools のみでビルド可能）
 
----
+### 変更
+- カメラ OCR を真の AR オーバーレイ実装に刷新 (#39)
+  - `LazyRow` チップを廃止し、値札上のバウンディングボックスに半透明チップを Canvas 描画
+  - `OcrScoreAccumulator`（Android 非依存）: フレーム横断スコア収束ロジック（検出→加算、非検出→減衰、閾値未満→削除）
+  - `OcrCoordinateMapper`: `ImageProxyTransformFactory` + `PreviewView.getOutputTransform()` + `CoordinateTransform.mapRect()` で画像座標→View座標変換
+  - `OcrRect` / `OcrRectF`: プラットフォーム非依存の座標型（`OcrScoreAccumulator` が Android 非依存であるための基盤）
+  - `PreviewView.ImplementationMode.COMPATIBLE` に固定し座標変換の精度を確保
+  - `CandidateKey`（step + normalizedText + regionBucket）で同一候補を跨フレームで識別
+  - `OcrScoreAccumulatorTest`: 9 ケース追加（スコア蓄積・上限・減衰・削除・表示閾値・regionBucket・reset・ソート・正規化）
+- `hiltViewModel` を `hilt-lifecycle-viewmodel-compose:1.3.0` の新パッケージに移行 (#37)
+  - `androidx.hilt.navigation.compose.hiltViewModel` → `androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel`
+  - `MainActivity.kt` の deprecated 警告を解消
 
-## [Unreleased] - 2026-05-30
-
-### 追加
-- `lefthook.yml` — lefthook 導入。pre-push で `./gradlew :app:testDebugUnitTest`（Android ユニットテスト）を実行し push 前ゲートとする。Kotlin リンタ（ktlint）は後続 #32 で対応予定。
+### 修正
+- AR オーバーレイ: `pointerInput(candidates)` を `pointerInput(Unit)` + `rememberUpdatedState` に変更し、OCR フレーム更新によるジェスチャー検出コルーチン再起動でタップが消失するバグを修正 (#42)
+- AR オーバーレイ: `viewTransformRef` (AtomicReference) を廃止し、アナライザースレッドで `inputTransform` を取得・メインスレッドで `previewView.outputTransform` を直接参照する方式に変更（StateFlow 等値チェックによる recomposition スキップで変換が null 固定になるバグを修正）(#42)
+- AR オーバーレイ: QUANTITY/COUNT ステップの `regionBucket=0` 固定化でカメラ微動による `CandidateKey` 分散を解消 (#42)
+- `TextParser`: 価格候補抽出時に直前文字が ASCII 英字またはドットの場合を除外し、`900m2` → `2` 等の OCR ノイズ偽陽性を低減 (#42)
+- `TextParser`: `QUANTITY_REGEX` を IGNORE_CASE 化し `QUANTITY_REGEX_NOISY_ML` を追加（`㎖` が `m2`/`m!`/`m&` 等に誤読された場合の noisy fallback）、`OCR_O_FOR_ZERO` で `O→0` 補正 (#42)
+- `TextParser`: `UNIT_SUFFIXES` の suffix 判定を `ignoreCase=true` に変更し大文字 OCR 結果の価格候補混入を防止 (#42)
+- `TextParser`: `QUANTITY_REGEX_NOISY_ML` に `(?![a-zA-Z])` 否定先読みを追加し `500mg`/`900mAh` 等の非 mL 単位の誤マッチを防止 (#42)
 
 ---
 
@@ -80,4 +61,4 @@
 ---
 
 <!-- 次のリリースはここに追加 -->
-<!-- ## [1.1.0] - YYYY-MM-DD -->
+<!-- ## [1.2.0] - YYYY-MM-DD -->
