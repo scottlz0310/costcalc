@@ -5,12 +5,23 @@ import android.graphics.Rect
 object TextParser {
 
     private val PRICE_EXTRACT_REGEX = Regex("""[\d,]+(?:\.\d+)?""")
-    private val QUANTITY_REGEX = Regex("""(\d+\.?\d*)\s*(g|kg|mL|ml|L|l|個|本|枚|袋|缶|箱|pack|Pack)""")
+    private val QUANTITY_REGEX = Regex(
+        """(\d+\.?\d*)\s*(g|kg|㎏|mL|ml|㎖|㍑|ℓ|cc|L|l|個|本|枚|袋|缶|箱|pack)""",
+        RegexOption.IGNORE_CASE,
+    )
+    // OCR ノイズ対応: ㎖ の ℓ 部分が 2/!/& 等に誤読される場合のフォールバック。
+    // 3桁以上の数値 + m/n（n は m の誤読）+ 任意1文字（任意）にマッチ。
+    // 3桁未満を除外することで "1m" "5m" 等（距離）との衝突を回避する。
+    private val QUANTITY_REGEX_NOISY_ML = Regex("""(\d{3,}\.?\d*)\s*[mMnN][0-9ℓlL!&?1]?""")
+    // OCR 誤読補正: 数字列の末尾 O/o を数値文脈（後続が単位文字）のときに 0 へ置換
+    // 例: "90Om" → "900m"
+    private val OCR_O_FOR_ZERO = Regex("""(\d+)[Oo](?=[mMnNgGkKlL])""")
 
     private val PRICE_CONTEXT_WORDS = setOf("¥", "円", "税込", "本体", "税抜", "price", "Price")
 
     // 数値直後にこれらが続く場合は価格ではなく内容量・単位とみなす
-    private val UNIT_SUFFIXES = listOf("kg", "mL", "ml", "個", "本", "枚", "袋", "缶", "箱", "g", "L", "l", "%", "℃")
+    // "m" は mL/ml/m2 等の OCR ノイズを含む一括除外。QUANTITY_REGEX の単位と同期させること
+    private val UNIT_SUFFIXES = listOf("kg", "㎏", "mL", "ml", "㎖", "㍑", "ℓ", "cc", "m", "個", "本", "枚", "袋", "缶", "箱", "g", "L", "l", "%", "℃")
 
     fun extractPriceCandidates(
         blocks: List<TextBlock>,
@@ -23,6 +34,13 @@ object TextParser {
                         val raw = match.value.replace(",", "")
                         val value = raw.toDoubleOrNull() ?: return@mapNotNull null
                         if (value < 1.0 || value > 999_999.0) return@mapNotNull null
+                        // 直前が ASCII 英字またはドットなら単位に続く数字（"m2" の "2"、".04" の "04" 等）→ 除外
+                        if (match.range.first > 0) {
+                            val charBefore = block.text[match.range.first - 1]
+                            if (charBefore in 'A'..'Z' || charBefore in 'a'..'z' || charBefore == '.') {
+                                return@mapNotNull null
+                            }
+                        }
                         // block 全体ではなくマッチした数値直後のサフィックスで判定（複合ブロック対策）
                         val textAfterMatch = block.text.substring(match.range.last + 1).trimStart()
                         if (UNIT_SUFFIXES.any { textAfterMatch.startsWith(it) }) return@mapNotNull null
@@ -39,9 +57,20 @@ object TextParser {
 
     fun extractQuantityCandidates(blocks: List<TextBlock>): List<OcrCandidate> {
         return blocks.mapNotNull { block ->
-            val match = QUANTITY_REGEX.find(block.text) ?: return@mapNotNull null
+            // OCR 誤読補正（O→0）を適用してから厳密マッチ
+            val preprocessed = OCR_O_FOR_ZERO.replace(block.text) { mr -> mr.groupValues[1] + "0" }
+            val strictMatch = QUANTITY_REGEX.find(preprocessed)
+            if (strictMatch != null) {
+                return@mapNotNull OcrCandidate(
+                    text = strictMatch.value.trim(),
+                    confidence = block.confidence,
+                    boundingBox = block.boundingBox,
+                )
+            }
+            // フォールバック: ㎖ が m2/m!/m& 等に誤読された場合は "900mL" に正規化
+            val noisyMatch = QUANTITY_REGEX_NOISY_ML.find(preprocessed) ?: return@mapNotNull null
             OcrCandidate(
-                text = match.value.trim(),
+                text = "${noisyMatch.groupValues[1]}mL",
                 confidence = block.confidence,
                 boundingBox = block.boundingBox,
             )
