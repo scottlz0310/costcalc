@@ -44,7 +44,7 @@ object TextParser {
                         }
                         // block 全体ではなくマッチした数値直後のサフィックスで判定（複合ブロック対策）
                         val textAfterMatch = block.text.substring(match.range.last + 1).trimStart()
-                        if (UNIT_SUFFIXES.any { textAfterMatch.startsWith(it) }) return@mapNotNull null
+                        if (UNIT_SUFFIXES.any { textAfterMatch.startsWith(it, ignoreCase = true) }) return@mapNotNull null
                         val score = scorePriceCandidate(block.text, block.boundingBox, imageBounds)
                         OcrCandidate(
                             text = raw,
