@@ -19,6 +19,7 @@
   - `UnitPriceViewModel` を NavGraph スコープで共有（Activity-scoped 昇格なし）
   - `TextParser`（純粋ロジック）の JUnit テスト 19 ケースを追加
 - Android SDK セットアップ手順を README.md に追加（Android Studio なし・cmdline-tools のみでビルド可能）
+- `lefthook.yml` 導入: pre-push で `./gradlew :app:testDebugUnitTest` を実行し push 前ゲートとする (#33)
 
 ### 変更
 - カメラ OCR を真の AR オーバーレイ実装に刷新 (#39)
