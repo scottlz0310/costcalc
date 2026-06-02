@@ -28,9 +28,9 @@ Android アプリ（Kotlin + Jetpack Compose）
 ## セットアップ
 
 ### 必要環境
-- Android Studio Ladybug（2024.2）以降
-- Android SDK 35
-- JDK 17
+- JDK 17 以上（Android Studio 付属の JBR でも可）
+- Android SDK（Android Studio 付属、または cmdline-tools のみでも可）
+- Android Studio は **任意**
 
 ### ビルド方法
 ```bash
@@ -43,6 +43,74 @@ cd costcalc
 
 # テスト実行
 ./gradlew test
+```
+
+### Android SDK セットアップ（Android Studio なしの場合）
+
+Android Studio なしで Android SDK Command-line Tools のみを使用してビルドできます。
+
+**SDK インストール先（Windows 推奨）**
+
+```
+%LOCALAPPDATA%\Android\Sdk
+```
+
+**cmdline-tools のダウンロード**
+
+[Android Studio ダウンロードページ](https://developer.android.com/studio#command-line-tools-only) の「Command line tools only」から Windows 用 ZIP を取得し、以下の構成で展開する。
+
+```
+%LOCALAPPDATA%\Android\Sdk\
+└── cmdline-tools\
+    └── latest\        ← ZIP 内の cmdline-tools フォルダをここに配置
+        └── bin\
+            └── sdkmanager.bat
+```
+
+**必要パッケージのインストール**
+
+```powershell
+$sdkmanager = "$env:LOCALAPPDATA\Android\Sdk\cmdline-tools\latest\bin\sdkmanager.bat"
+
+# ライセンスに同意
+& $sdkmanager --licenses
+
+# 必要パッケージをインストール
+& $sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+```
+
+**local.properties の作成**
+
+プロジェクトルートに `local.properties` を作成する（`<username>` を実際のユーザー名に置き換える）。
+
+```properties
+sdk.dir=C\:\\Users\\<username>\\AppData\\Local\\Android\\Sdk
+```
+
+> `local.properties` はローカル環境依存のため `.gitignore` に含まれており、コミットしない。
+
+**環境変数（省略可）**
+
+```powershell
+$env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
+$env:ANDROID_SDK_ROOT = "$env:LOCALAPPDATA\Android\Sdk"
+$env:PATH = "$env:ANDROID_HOME\cmdline-tools\latest\bin;$env:ANDROID_HOME\platform-tools;$env:PATH"
+```
+
+**SDK の更新**
+
+```powershell
+& $sdkmanager --update
+```
+
+**実機への転送（APK 直接インストール）**
+
+```powershell
+# APK ビルド
+.\gradlew.bat assembleDebug
+
+# adb でインストール（USB デバッグ有効な端末を接続済みの場合）
+adb install app\build\outputs\apk\debug\app-debug.apk
 ```
 
 ### Git フック（lefthook）
@@ -80,6 +148,7 @@ com.example.shoptools
 └─ feature/
    ├─ unitprice/
    │  ├─ ui/             (UnitPriceScreen)
+   │  │  └─ ocr/         (CameraOcrScreen, OcrViewModel, TextParser, OcrCandidate)
    │  ├─ domain/         (UnitPriceCalculator)
    │  └─ UnitPriceViewModel.kt
    ├─ stamps/
@@ -98,6 +167,8 @@ com.example.shoptools
 - ViewModel + StateFlow (MVVM)
 - Hilt (DI)
 - DataStore Preferences (設定の永続化)
+- CameraX 1.5.1（カメラプレビュー・画像解析）
+- ML Kit Text Recognition Japanese（オフライン OCR）
 - JUnit 4 (単体テスト)
 
 ---

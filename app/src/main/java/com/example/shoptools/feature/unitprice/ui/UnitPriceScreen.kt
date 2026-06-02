@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,7 +25,10 @@ import com.example.shoptools.feature.unitprice.UnitPriceResult
 import com.example.shoptools.feature.unitprice.UnitPriceViewModel
 
 @Composable
-fun UnitPriceScreen(viewModel: UnitPriceViewModel) {
+fun UnitPriceScreen(
+    viewModel: UnitPriceViewModel,
+    onOpenCamera: (rowId: String) -> Unit = {},
+) {
     val state by viewModel.uiState.collectAsState()
 
     LazyColumn(
@@ -87,6 +91,7 @@ fun UnitPriceScreen(viewModel: UnitPriceViewModel) {
                 onUpdate = { viewModel.onEvent(UnitPriceEvent.UpdateRow(it)) },
                 onRemove = { viewModel.onEvent(UnitPriceEvent.RemoveRow(row.id)) },
                 onClear = { viewModel.onEvent(UnitPriceEvent.ClearRow(row.id)) },
+                onOpenCamera = { onOpenCamera(row.id) },
                 canRemove = state.rows.size > 1,
             )
         }
@@ -121,6 +126,7 @@ private fun ProductRowEditor(
     onUpdate: (ProductRow) -> Unit,
     onRemove: () -> Unit,
     onClear: () -> Unit,
+    onOpenCamera: () -> Unit,
     canRemove: Boolean,
 ) {
     Card(
@@ -136,6 +142,9 @@ private fun ProductRowEditor(
                     modifier = Modifier.weight(1f),
                     maxLines = 1,
                 )
+                IconButton(onClick = onOpenCamera) {
+                    Icon(Icons.Default.PhotoCamera, contentDescription = "カメラで入力")
+                }
                 IconButton(onClick = if (canRemove) onRemove else onClear) {
                     Icon(Icons.Default.Delete, contentDescription = if (canRemove) "削除" else "クリア")
                 }

@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     implementation(libs.compose.material.icons.core)
+    implementation(libs.compose.material.icons.extended)
     debugImplementation(libs.compose.ui.tooling)
 
     // Navigation
@@ -77,6 +78,7 @@ dependencies {
 
     // Lifecycle / ViewModel
     implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.lifecycle.runtime.compose)
 
     // Hilt
     implementation(libs.hilt.android)
@@ -88,6 +90,15 @@ dependencies {
 
     // Material Components (テーマベースライン)
     implementation(libs.material)
+
+    // CameraX
+    implementation(libs.camerax.core)
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.view)
+
+    // ML Kit
+    implementation(libs.mlkit.text.recognition.japanese)
 
     // Tests
     testImplementation(libs.junit)
