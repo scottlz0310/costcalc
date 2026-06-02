@@ -16,9 +16,9 @@ class OcrScoreAccumulator(
         val viewRect: OcrRectF?,
     )
 
-    private val _scores = mutableMapOf<CandidateKey, Entry>()
+    private val scores = mutableMapOf<CandidateKey, Entry>()
 
-    val size: Int get() = _scores.size
+    val size: Int get() = scores.size
 
     /**
      * @param frame 今フレームで検出された候補。未検出キーは減衰・剪定対象。
@@ -28,32 +28,35 @@ class OcrScoreAccumulator(
 
         // 非検出候補を減衰し、閾値未満を削除
         val toRemove = mutableListOf<CandidateKey>()
-        _scores.forEach { (key, entry) ->
+        scores.forEach { (key, entry) ->
             if (key !in detectedKeys) {
                 val decayed = entry.score * decayFactor
-                if (decayed < pruneThreshold) toRemove.add(key)
-                else _scores[key] = entry.copy(score = decayed)
+                if (decayed < pruneThreshold) {
+                    toRemove.add(key)
+                } else {
+                    scores[key] = entry.copy(score = decayed)
+                }
             }
         }
-        toRemove.forEach { _scores.remove(it) }
+        toRemove.forEach { scores.remove(it) }
 
         // 検出候補のスコアを加算し、viewRect を最新フレームで更新
         frame.forEach { (key, entry) ->
-            val current = _scores[key]?.score ?: 0f
-            _scores[key] = entry.copy(score = (current + entry.score).coerceAtMost(maxScore))
+            val current = scores[key]?.score ?: 0f
+            scores[key] = entry.copy(score = (current + entry.score).coerceAtMost(maxScore))
         }
     }
 
     /** minVisibleScore 以上の候補をスコア降順で返す。 */
     fun getVisible(): List<Pair<CandidateKey, Entry>> =
-        _scores.entries
+        scores.entries
             .filter { it.value.score >= minVisibleScore }
             .map { it.toPair() }
             .sortedByDescending { it.second.score }
 
     fun normalizedScore(score: Float): Float = (score / maxScore).coerceIn(0f, 1f)
 
-    fun reset() = _scores.clear()
+    fun reset() = scores.clear()
 
     companion object {
         const val DECAY_FACTOR_DEFAULT = 0.85f

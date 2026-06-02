@@ -5,14 +5,15 @@ import org.junit.Before
 import org.junit.Test
 
 class OcrScoreAccumulatorTest {
-
     private lateinit var accumulator: OcrScoreAccumulator
 
     private val key1 = CandidateKey(OcrStep.PRICE, "198", regionBucket = 10)
     private val key2 = CandidateKey(OcrStep.PRICE, "298", regionBucket = 20)
 
-    private fun entry(text: String, score: Float = 0.8f) =
-        OcrScoreAccumulator.Entry(text, score, viewRect = null)
+    private fun entry(
+        text: String,
+        score: Float = 0.8f,
+    ) = OcrScoreAccumulator.Entry(text, score, viewRect = null)
 
     @Before
     fun setUp() {

@@ -84,8 +84,11 @@ private fun MainScaffold() {
                                 )
                             },
                             label = { Text(stringResource(screen.labelRes)) },
-                            selected = navBackStackEntry?.destination?.hierarchy
-                                ?.any { it.route == screen.route } == true,
+                            selected =
+                                navBackStackEntry
+                                    ?.destination
+                                    ?.hierarchy
+                                    ?.any { it.route == screen.route } == true,
                             onClick = {
                                 navController.navigate(screen.route) {
                                     popUpTo(navController.graph.findStartDestination().id) {
@@ -108,9 +111,10 @@ private fun MainScaffold() {
         ) {
             navigation(startDestination = Screen.UnitPrice.route, route = UNIT_PRICE_GRAPH) {
                 composable(Screen.UnitPrice.route) { backStackEntry ->
-                    val parentEntry = remember(backStackEntry) {
-                        navController.getBackStackEntry(UNIT_PRICE_GRAPH)
-                    }
+                    val parentEntry =
+                        remember(backStackEntry) {
+                            navController.getBackStackEntry(UNIT_PRICE_GRAPH)
+                        }
                     val vm: UnitPriceViewModel = hiltViewModel(parentEntry)
                     UnitPriceScreen(
                         viewModel = vm,
@@ -121,9 +125,10 @@ private fun MainScaffold() {
                 }
                 composable(ROUTE_OCR) { backStackEntry ->
                     val rowId = backStackEntry.arguments?.getString("rowId") ?: return@composable
-                    val parentEntry = remember(backStackEntry) {
-                        navController.getBackStackEntry(UNIT_PRICE_GRAPH)
-                    }
+                    val parentEntry =
+                        remember(backStackEntry) {
+                            navController.getBackStackEntry(UNIT_PRICE_GRAPH)
+                        }
                     val unitPriceVm: UnitPriceViewModel = hiltViewModel(parentEntry)
                     val ocrVm: OcrViewModel = hiltViewModel()
                     CameraOcrScreen(

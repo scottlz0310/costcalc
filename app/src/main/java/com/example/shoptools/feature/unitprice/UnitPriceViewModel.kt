@@ -157,17 +157,18 @@ class UnitPriceViewModel
 
         private fun applyOcrResult(event: UnitPriceEvent.ApplyOcrResult) {
             _uiState.update { state ->
-                val rows = state.rows.map { row ->
-                    if (row.id != event.rowId) return@map row
-                    validated(
-                        row.copy(
-                            price = event.price.ifBlank { row.price },
-                            quantity = event.quantity.ifBlank { row.quantity },
-                            unit = event.unit.ifBlank { row.unit },
-                            count = event.count.ifBlank { row.count },
-                        ),
-                    )
-                }
+                val rows =
+                    state.rows.map { row ->
+                        if (row.id != event.rowId) return@map row
+                        validated(
+                            row.copy(
+                                price = event.price.ifBlank { row.price },
+                                quantity = event.quantity.ifBlank { row.quantity },
+                                unit = event.unit.ifBlank { row.unit },
+                                count = event.count.ifBlank { row.count },
+                            ),
+                        )
+                    }
                 state.copy(rows = rows)
             }
             recalculate()

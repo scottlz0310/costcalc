@@ -28,29 +28,29 @@ class SettingsRepository
     constructor(
         @ApplicationContext private val context: Context,
     ) {
-        private val FONT_SIZE_PRESET = stringPreferencesKey("font_size_preset")
-        private val USE_DIGIT_SEPARATOR = booleanPreferencesKey("use_digit_separator")
+        private val fontSizePresetKey = stringPreferencesKey("font_size_preset")
+        private val useDigitSeparatorKey = booleanPreferencesKey("use_digit_separator")
 
         val settingsFlow: Flow<AppSettings> =
             context.dataStore.data.map { prefs ->
                 AppSettings(
                     fontSizePreset =
-                        prefs[FONT_SIZE_PRESET]?.let {
+                        prefs[fontSizePresetKey]?.let {
                             runCatching { FontSizePreset.valueOf(it) }.getOrNull()
                         } ?: FontSizePreset.NORMAL,
-                    useDigitSeparator = prefs[USE_DIGIT_SEPARATOR] ?: false,
+                    useDigitSeparator = prefs[useDigitSeparatorKey] ?: false,
                 )
             }
 
         suspend fun setFontSizePreset(preset: FontSizePreset) {
             context.dataStore.edit { prefs ->
-                prefs[FONT_SIZE_PRESET] = preset.name
+                prefs[fontSizePresetKey] = preset.name
             }
         }
 
         suspend fun setUseDigitSeparator(enabled: Boolean) {
             context.dataStore.edit { prefs ->
-                prefs[USE_DIGIT_SEPARATOR] = enabled
+                prefs[useDigitSeparatorKey] = enabled
             }
         }
     }
