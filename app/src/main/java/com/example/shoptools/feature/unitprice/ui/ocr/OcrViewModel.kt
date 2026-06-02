@@ -2,7 +2,6 @@ package com.example.shoptools.feature.unitprice.ui.ocr
 
 import android.graphics.Rect
 import androidx.lifecycle.ViewModel
-import com.google.mlkit.vision.text.Text
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,32 +15,30 @@ class OcrViewModel @Inject constructor() : ViewModel() {
     private val _uiState = MutableStateFlow(OcrUiState())
     val uiState: StateFlow<OcrUiState> = _uiState.asStateFlow()
 
-    fun onTextRecognized(result: Text, imageWidth: Int, imageHeight: Int) {
-        val blocks = result.textBlocks.map { block ->
-            val confidence = block.lines
-                .flatMap { it.elements }
-                .mapNotNull { it.confidence }
-                .let { confidences ->
-                    if (confidences.isEmpty()) 0.5f else confidences.average().toFloat()
-                }
-            TextBlock(
-                text = block.text,
-                confidence = confidence,
-                boundingBox = block.boundingBox,
+    private val accumulator = OcrScoreAccumulator()
+
+    /**
+     * CameraOcrScreen の analyzer callback（メインスレッド）から呼ばれる。
+     * CameraX / Android 依存の変換は CameraOcrScreen 側で完了済みであること。
+     */
+    fun onCandidatesDetected(
+        candidates: List<OcrCandidate>,
+        imageWidth: Int,
+        imageHeight: Int,
+    ) {
+        val step = _uiState.value.currentStep
+        val frame = buildFrame(candidates, step, imageWidth, imageHeight)
+        accumulator.update(frame)
+
+        val visible = accumulator.getVisible().map { (key, entry) ->
+            OcrCandidate(
+                text = entry.text,
+                confidence = accumulator.normalizedScore(entry.score),
+                boundingBox = null,
+                boundingBoxView = entry.viewRect,
             )
         }
-
-        val step = _uiState.value.currentStep
-        val candidates = when (step) {
-            OcrStep.PRICE -> {
-                val bounds = Rect(0, 0, imageWidth, imageHeight)
-                TextParser.extractPriceCandidates(blocks, bounds)
-            }
-            OcrStep.QUANTITY -> TextParser.extractQuantityCandidates(blocks)
-            OcrStep.COUNT -> TextParser.extractCountCandidates(blocks)
-        }.filter { it.meetsThreshold }
-
-        _uiState.update { it.copy(candidates = candidates) }
+        _uiState.update { it.copy(candidates = visible) }
     }
 
     fun onEvent(event: OcrEvent) {
@@ -52,11 +49,34 @@ class OcrViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    private fun buildFrame(
+        candidates: List<OcrCandidate>,
+        step: OcrStep,
+        imageWidth: Int,
+        imageHeight: Int,
+    ): Map<CandidateKey, OcrScoreAccumulator.Entry> =
+        candidates
+            .filter { it.meetsThreshold }
+            .associate { candidate ->
+                val normalizedText = candidate.text.trim().lowercase().replace(",", "")
+                val bucket = candidate.boundingBox
+                    ?.toOcrRect()
+                    ?.regionBucket(imageWidth, imageHeight)
+                    ?: 0
+                val key = CandidateKey(step, normalizedText, bucket)
+                val entry = OcrScoreAccumulator.Entry(
+                    text = candidate.text,
+                    score = candidate.confidence,
+                    viewRect = candidate.boundingBoxView,
+                )
+                key to entry
+            }
+
     private fun confirmCandidate(candidate: OcrCandidate) {
-        val state = _uiState.value
-        when (state.currentStep) {
+        when (_uiState.value.currentStep) {
             OcrStep.PRICE -> {
                 val price = TextParser.extractPriceValue(candidate.text) ?: candidate.text
+                accumulator.reset()
                 _uiState.update {
                     it.copy(
                         confirmedPrice = price,
@@ -69,6 +89,7 @@ class OcrViewModel @Inject constructor() : ViewModel() {
             OcrStep.QUANTITY -> {
                 val parsed = TextParser.parseQuantity(candidate.text)
                 if (parsed != null) {
+                    accumulator.reset()
                     _uiState.update {
                         it.copy(
                             confirmedQuantity = parsed.value,
@@ -88,6 +109,7 @@ class OcrViewModel @Inject constructor() : ViewModel() {
                 }
             }
             OcrStep.COUNT -> {
+                accumulator.reset()
                 _uiState.update {
                     it.copy(
                         confirmedCount = candidate.text,
@@ -101,13 +123,16 @@ class OcrViewModel @Inject constructor() : ViewModel() {
     }
 
     private fun skipStep() {
-        val step = _uiState.value.currentStep
-        if (step == OcrStep.COUNT) {
+        if (_uiState.value.currentStep == OcrStep.COUNT) {
+            accumulator.reset()
             _uiState.update { it.copy(candidates = emptyList(), parseError = "", isComplete = true) }
         }
     }
 
     private fun reset() {
+        accumulator.reset()
         _uiState.value = OcrUiState()
     }
 }
+
+private fun Rect.toOcrRect() = OcrRect(left, top, right, bottom)
