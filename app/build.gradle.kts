@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.example.shoptools"
-    compileSdk = 36
+    compileSdk = 37
 
     val keystoreProps = Properties().also { props ->
         val propsFile = rootProject.file("keystore.properties")
