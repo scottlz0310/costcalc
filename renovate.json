@@ -5,5 +5,15 @@
     "github>scottlz0310/renovate-config//presets/languages/android",
     "github>scottlz0310/renovate-config//presets/options/schedule",
     "github>scottlz0310/renovate-config//presets/options/security"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "org.jetbrains.kotlin.android",
+        "org.jetbrains.kotlin.plugin.compose"
+      ],
+      "allowedVersions": "2.3.21",
+      "description": "Kotlin 2.4.0 は Hilt/Dagger の kotlin-metadata-jvm 未対応のため固定。Hilt 追従後に解除する。"
+    }
   ]
 }

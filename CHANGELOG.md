@@ -9,6 +9,7 @@
 
 ### 変更
 - `compileSdk` を 36 → 37 に引き上げ（`androidx.core:core-ktx 1.19.0` の要件に対応）
+- Renovate: Kotlin を `2.3.21` に固定（Hilt/Dagger の kotlin-metadata-jvm 2.4.0 未対応のため、Hilt 追従後に解除）
 
 ---
 
