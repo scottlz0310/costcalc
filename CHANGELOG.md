@@ -9,6 +9,7 @@
 
 ### 変更
 - `compileSdk` を 36 → 37 に引き上げ（`androidx.core:core-ktx 1.19.0` の要件に対応）
+- Dagger/Hilt 2.60 の生成 Java ソースが参照する `error_prone_annotations` を `compileOnly` 依存として明示し、推移依存への暗黙依存を解消
 
 ---
 

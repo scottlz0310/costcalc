@@ -82,6 +82,8 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
+    // Hilt 2.60 の生成 Java ソースが参照するコンパイル時専用 annotation。
+    compileOnly(libs.errorprone.annotations)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.hilt.lifecycle.viewmodel.compose)
