@@ -6,6 +6,14 @@ Android アプリ（Kotlin + Jetpack Compose）
 
 ---
 
+## 配布
+
+公式の配布先は **Google Play のみ**（現在準備中）。GitHub Releases への APK 添付は終了した。
+
+タグ push 時に CI が生成するのは Play へアップロードするための AAB のみで、Actions artifact としてのみ保持する。リポジトリからビルドした独自ビルドは公式版・公式サポート対象として扱わない。
+
+---
+
 ## 機能
 
 ### 🛒 単価比較
