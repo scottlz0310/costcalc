@@ -1,13 +1,18 @@
 {
   "name": "costcalc-scripts",
   "version": "1.0.0",
-  "description": "アイコン生成などの開発補助スクリプト",
+  "description": "アイコン生成などの開発補助スクリプトと Git フック",
   "type": "module",
   "packageManager": "pnpm@11.25.0",
   "scripts": {
-    "gen-icons": "node scripts/generate_icons.mjs"
+    "prepare": "lefthook install",
+    "gen-icons": "node scripts/generate_icons.mjs",
+    "gen-play-assets": "node scripts/generate_play_assets.mjs"
   },
   "dependencies": {
     "@napi-rs/canvas": "^1.0.8"
+  },
+  "devDependencies": {
+    "lefthook": "^2.1.12"
   }
 }

@@ -6,7 +6,6 @@
     "github>scottlz0310/renovate-config//presets/languages/android",
     "github>scottlz0310/renovate-config//presets/package-managers/pnpm",
     "github>scottlz0310/renovate-config//presets/tools/lefthook",
-    "github>scottlz0310/renovate-config//presets/options/automerge",
     "github>scottlz0310/renovate-config//presets/options/schedule",
     "github>scottlz0310/renovate-config//presets/options/security"
   ]
