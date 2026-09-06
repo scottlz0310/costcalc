@@ -1,7 +1,12 @@
+---
+title: プライバシーポリシー
+permalink: /privacy-policy/
+---
+
 # プライバシーポリシー
 
 **アプリ名**: お買い物計算ツール（`io.github.scottlz0310.shoptools`）
-**提供者**: 有限会社菅原建設（SUGAWARA KENSETSU Y.K.）
+**提供者**: 菅原建設有限会社（SUGAWARA KENSETSU Y.K.）
 **最終更新日**: 2026年9月6日
 
 ---

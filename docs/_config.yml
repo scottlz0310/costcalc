@@ -1,0 +1,10 @@
+# GitHub Pages 設定。
+# Play はストア掲載欄に到達可能なプライバシーポリシー URL を要求するため、
+# このリポジトリの docs/ を GitHub Pages で公開してその URL を提供する。
+title: お買い物計算ツール
+description: Android アプリ「お買い物計算ツール」のドキュメント
+theme: jekyll-theme-minimal
+
+# ストア掲載の原稿は開発者向けの作業メモであり、公開ページにする意味がない。
+exclude:
+  - play-store-listing.md
