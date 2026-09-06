@@ -1,0 +1,11 @@
+# pnpm 11 は strictDepBuilds が既定で true のため、依存のビルドスクリプトに対する
+# 許可・拒否を明示しないと `pnpm install` が終了コード 1 で失敗する。
+# 判断を pnpm-workspace.yaml の allowBuilds に記録する
+# （pnpm 11 で onlyBuiltDependencies / ignoredBuiltDependencies 等は削除された）。
+allowBuilds:
+  # lefthook の postinstall は `lefthook install` を実行するだけで、
+  # package.json の prepare スクリプトと重複する。バイナリは
+  # optionalDependencies の lefthook-<os>-<arch> から解決されるため、
+  # ビルドスクリプトを実行しなくてもフック登録は prepare 側で完結する。
+  # 第三者のスクリプトを走らせる必要がないので明示的に拒否する。
+  lefthook: false
