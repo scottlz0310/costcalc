@@ -7,10 +7,24 @@
 
 ## [Unreleased]
 
+---
+
+## [1.2.0] - 2026-09-06
+
+**Google Play での初回リリース。** 公式配布を Google Play 一本に切り替え、`applicationId` を移行した。
+
 ### 追加
 - Google Play 掲載用の原稿を `docs/` に追加 (#73)
-  - `docs/privacy-policy.md` — プライバシーポリシー（Play が URL を要求するため、GitHub Pages での公開が必要）
+  - `docs/privacy-policy.md` — プライバシーポリシー。GitHub Pages で `https://scottlz0310.github.io/costcalc/privacy-policy/` として公開する
   - `docs/play-store-listing.md` — ストア掲載文・データセーフティ申告・コンテンツレーティング・素材チェックリスト
+- `docs/` を GitHub Pages で配信する設定（`_config.yml` / `index.md`）(#73)
+- `scripts/generate_play_assets.mjs` — Play の要求仕様に合わせて素材を変換する (#73)
+  - スクリーンショットは撮影元の 1096×2560 が「長辺は短辺の2倍以内」を満たさないため、システムナビゲーションバーを除いて 9:16（1440×2560）へ整形する
+  - フィーチャーグラフィックを 1024×500 へ
+- `pnpm-lock.yaml` を追跡対象に追加し、`packageManager` で pnpm 11.25.0 を固定 (#73)
+- lefthook を `devDependencies` で管理し、`pnpm install` の `prepare` でフック登録まで完了させる (#73)
+- `pnpm-workspace.yaml` の `allowBuilds` で lefthook のビルドスクリプトを明示的に拒否 (#73)
+  - pnpm 11 は `strictDepBuilds` が既定 true のため、未定義だと `pnpm install --frozen-lockfile` が終了コード 1 で失敗する
 
 ### 破壊的変更
 - `applicationId` を `com.example.shoptools` から `io.github.scottlz0310.shoptools` へ変更 (#73)
@@ -31,6 +45,8 @@
   - 新しい鍵は Play へアップロードする AAB のアップロード鍵として使う
 - `compileSdk` を 36 → 37 に引き上げ（`androidx.core:core-ktx 1.19.0` の要件に対応）
 - Dagger/Hilt 2.60 の生成 Java ソースが参照する `error_prone_annotations` を `compileOnly` 依存として明示し、推移依存への暗黙依存を解消
+- Renovate に Node.js / pnpm / lefthook のプリセットを追加 (#73)
+  - ロックファイルの追跡により npm エコシステムが対象になったため。`options/automerge` は required status checks でゲートできないため採用しない
 
 ---
 
