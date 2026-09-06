@@ -7,12 +7,21 @@
 
 ## [Unreleased]
 
+### 追加
+- Google Play 掲載用の原稿を `docs/` に追加 (#73)
+  - `docs/privacy-policy.md` — プライバシーポリシー（Play が URL を要求するため、GitHub Pages での公開が必要）
+  - `docs/play-store-listing.md` — ストア掲載文・データセーフティ申告・コンテンツレーティング・素材チェックリスト
+
 ### 破壊的変更
 - `applicationId` を `com.example.shoptools` から `io.github.scottlz0310.shoptools` へ変更 (#73)
   - **既存インストールは自動更新されない。** Android は `applicationId` が異なるアプリを別アプリとして扱うため、更新するには一度アンインストールしてから再インストールする必要がある
   - `namespace` と Kotlin の `package` も同じ名前空間へ統一
 
 ### 変更
+- アプリ名を `ShopTools` から `お買い物計算ツール` へ変更 (#73)
+  - Play 掲載にあたり、日本語話者に機能が伝わる名前にする。ランチャー表示名とストア掲載名を揃える
+  - コード上の識別子（`ShopToolsApp` / `ShopToolsTheme` / `Theme.ShopTools`）はコード名として維持する
+- `versionCode` を 4 へ、`versionName` を `1.2.0` へ更新 (#73)
 - 公式配布を Google Play 一本に変更 (#73)
   - GitHub Releases への APK 添付を廃止。タグ push では Play アップロード用の AAB を生成し、Actions artifact としてのみ保持する（retention 7日）
   - GitHub Release の draft 作成はリリースノート用に継続するが、バイナリは添付しない
