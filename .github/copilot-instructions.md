@@ -24,13 +24,13 @@
 ./gradlew test
 
 # 特定テストクラスのみ実行
-./gradlew test --tests "com.example.shoptools.feature.stamps.domain.BoundedSubsetSumTest"
+./gradlew test --tests "io.github.scottlz0310.shoptools.feature.stamps.domain.BoundedSubsetSumTest"
 ```
 
 ## アーキテクチャ
 
 ```
-com.example.shoptools
+io.github.scottlz0310.shoptools
 ├─ app/        # Application クラス、MainActivity、NavHost、Screen sealed class
 ├─ design/     # ShopToolsTheme、LargeResultCard、ErrorText（共通 UI パーツ）
 ├─ core/       # NumberFormat（formatUnitPrice / formatAmount）、Validation（validateXxx 関数群）

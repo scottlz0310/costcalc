@@ -7,6 +7,11 @@
 
 ## [Unreleased]
 
+### 破壊的変更
+- `applicationId` を `com.example.shoptools` から `io.github.scottlz0310.shoptools` へ変更 (#73)
+  - **既存インストールは自動更新されない。** Android は `applicationId` が異なるアプリを別アプリとして扱うため、更新するには一度アンインストールしてから再インストールする必要がある
+  - `namespace` と Kotlin の `package` も同じ名前空間へ統一
+
 ### 変更
 - `compileSdk` を 36 → 37 に引き上げ（`androidx.core:core-ktx 1.19.0` の要件に対応）
 - Dagger/Hilt 2.60 の生成 Java ソースが参照する `error_prone_annotations` を `compileOnly` 依存として明示し、推移依存への暗黙依存を解消

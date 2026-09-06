@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.shoptools"
+    namespace = "io.github.scottlz0310.shoptools"
     compileSdk = 37
 
     val keystoreProps = Properties().also { props ->
@@ -29,7 +29,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.shoptools"
+        applicationId = "io.github.scottlz0310.shoptools"
         minSdk = 26
         targetSdk = 36
         versionCode = 3
