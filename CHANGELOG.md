@@ -13,6 +13,13 @@
   - `namespace` と Kotlin の `package` も同じ名前空間へ統一
 
 ### 変更
+- 公式配布を Google Play 一本に変更 (#73)
+  - GitHub Releases への APK 添付を廃止。タグ push では Play アップロード用の AAB を生成し、Actions artifact としてのみ保持する（retention 7日）
+  - GitHub Release の draft 作成はリリースノート用に継続するが、バイナリは添付しない
+  - main push での debug APK artifact 公開を廃止（ビルド検証としての `assembleDebug` は継続）
+- release 署名鍵を再作成 (#73)
+  - 旧鍵は GitHub Actions secrets にしか存在せず読み出し不可のため実質失われていた
+  - 新しい鍵は Play へアップロードする AAB のアップロード鍵として使う
 - `compileSdk` を 36 → 37 に引き上げ（`androidx.core:core-ktx 1.19.0` の要件に対応）
 - Dagger/Hilt 2.60 の生成 Java ソースが参照する `error_prone_annotations` を `compileOnly` 依存として明示し、推移依存への暗黙依存を解消
 

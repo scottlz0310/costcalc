@@ -47,6 +47,12 @@ proguard/
 test-results/
 
 # 署名設定（パスワードを含むため git 管理外）
+keystore.properties
+signing.properties
+*.jks
+*.keystore
+*.p12
+.env
 
 # アイコン生成スクリプト用（Node.js）
 node_modules/
@@ -55,4 +61,3 @@ node_modules/
 icon_source.png
 play_store_icon.png
 icon_compare.png
-keystore.properties
