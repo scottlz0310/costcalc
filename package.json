@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "アイコン生成などの開発補助スクリプト",
   "type": "module",
+  "packageManager": "pnpm@11.25.0",
   "scripts": {
     "gen-icons": "node scripts/generate_icons.mjs"
   },
