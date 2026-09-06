@@ -61,3 +61,6 @@ node_modules/
 icon_source.png
 play_store_icon.png
 icon_compare.png
+
+# Play ストア用の生成物（scripts/generate_play_assets.mjs で再生成できる）
+assets/play/
