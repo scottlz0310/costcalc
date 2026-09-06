@@ -141,7 +141,7 @@ lefthook install
 ## アーキテクチャ
 
 ```
-com.example.shoptools
+io.github.scottlz0310.shoptools
 ├─ app/        (Application, MainActivity, NavHost)
 ├─ design/     (Theme, LargeResultCard, ErrorText)
 ├─ core/       (NumberFormat, Validation)
