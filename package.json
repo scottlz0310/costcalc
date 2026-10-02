@@ -10,9 +10,9 @@
     "gen-play-assets": "node scripts/generate_play_assets.mjs"
   },
   "dependencies": {
-    "@napi-rs/canvas": "^1.0.9"
+    "@napi-rs/canvas": "^1.0.10"
   },
   "devDependencies": {
-    "lefthook": "^2.1.15"
+    "lefthook": "^2.1.16"
   }
 }
