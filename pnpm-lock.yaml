@@ -167,232 +167,232 @@ importers:
   .:
     dependencies:
       '@napi-rs/canvas':
-        specifier: ^1.0.9
-        version: 1.0.9
+        specifier: ^1.0.10
+        version: 1.0.10
     devDependencies:
       lefthook:
-        specifier: ^2.1.15
-        version: 2.1.15
+        specifier: ^2.1.16
+        version: 2.1.16
 
 packages:
 
-  '@napi-rs/canvas-android-arm64@1.0.9':
-    resolution: {integrity: sha512-4LGXk2/0HVzE29K8SzML5WubgCp++B1FH3qgl35XmSZE+lLdr6P9VRQEnZ0MCLZMTSuJP41yyhtoiVNEuvrTIA==}
+  '@napi-rs/canvas-android-arm64@1.0.10':
+    resolution: {integrity: sha512-0sDMvme+7fj6bHERUaBs5SvEyWaORc91VUkaB4RrtG7p6dBrBNGy1of8cyEKDxygd1FlHtW+Thunj8lSixzY7A==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [android]
 
-  '@napi-rs/canvas-darwin-arm64@1.0.9':
-    resolution: {integrity: sha512-YNdfLBzY0W/Pep9fo2L6RmoNlNksnn05LRnX66W63R3ij58S25QOTcjdtEt2v8+PnCESzqZsYzUo+QPeIR44NA==}
+  '@napi-rs/canvas-darwin-arm64@1.0.10':
+    resolution: {integrity: sha512-pdHL1TEfFMrnchRYqmPWXKN7hR4XtOYmzJqnh4XhpfWD4/eeSokOGVzrdFP/iQ3sfr2rf0939gOGq9uCp8BGmg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
 
-  '@napi-rs/canvas-darwin-x64@1.0.9':
-    resolution: {integrity: sha512-ceZQSknTEcy3dOXoekv59LTCkXjvnLsq+VW5PeNNDHEPQbRS5Ervkm1EaDa7WLAjiYWMLuSQTRTHao1dEX4prg==}
+  '@napi-rs/canvas-darwin-x64@1.0.10':
+    resolution: {integrity: sha512-iuuk5plGxAcxurxv2ycF2yR20y5zvaBZ4heQdhPpg3EMFD21PhlY1V+YwSRmYRWzbvKL474UYdw3WIg2qfafyw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
 
-  '@napi-rs/canvas-linux-arm-gnueabihf@1.0.9':
-    resolution: {integrity: sha512-XhfI0Wwv4llhd6nnWDtY3kQKjq0r+y1i91PlJlJI24ag2U9WrnwbG1qS3+fDLEyouwEVFchiKkTEHozK+5iUNA==}
+  '@napi-rs/canvas-linux-arm-gnueabihf@1.0.10':
+    resolution: {integrity: sha512-kH7GFR5Unpm77pKSEsmkqvzeQCRD7/MQ7upmeLLjg4XpQ62dX/R6THFsp6vkF1Pkco2aKUq9KhoLM4W5twdk7g==}
     engines: {node: '>= 10'}
     cpu: [arm]
     os: [linux]
 
-  '@napi-rs/canvas-linux-arm64-gnu@1.0.9':
-    resolution: {integrity: sha512-012oiYtKaE7i9oxc8q7nraT7kDOpLcaCmFLzVe9Ty34RHDdoDzbWLrVh827CNxYh/EADX1eSikA3ymLjo/nNuw==}
+  '@napi-rs/canvas-linux-arm64-gnu@1.0.10':
+    resolution: {integrity: sha512-0/Hj7IwM9pmzdwxiqkp4YLJ8dKqASBrWQ3Y7dWUSU/4dgvCL9O6YNvX7xVUJjonQvdD3IE9ESS/nXa5srQqoVw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@napi-rs/canvas-linux-arm64-musl@1.0.9':
-    resolution: {integrity: sha512-Ls5UWYFFn63casTZEczbeyEg3vRDRkv9lscuGwfchtY5yLLQhgOB8SN4YGxmfJ5vTaBwZ2YUxBS3NtmjJmFXdA==}
+  '@napi-rs/canvas-linux-arm64-musl@1.0.10':
+    resolution: {integrity: sha512-fmjKM0P2MLF9O6XzCQsRjhB+jlLzaf6tFQU36hMPMsYup+VThYvpjjhqNLOc/Ee3tHUE3r13H2BSJx/yXz4pFA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@napi-rs/canvas-linux-riscv64-gnu@1.0.9':
-    resolution: {integrity: sha512-hLKEGxV7ZiRHqndePTokgDMdBlo/rDfzg7P4p4QIv9pUhuYobnu3R2NIFLCRghG0nwfo+s2sw+c1xZFeCmEAsw==}
+  '@napi-rs/canvas-linux-riscv64-gnu@1.0.10':
+    resolution: {integrity: sha512-O/BUrGwrs3pVP9PpD/3++ZiOpjHMJlmiB7aBgswP8rbe4egPfiFkFxmcCczoLvZa72TaQX5lJ8Udedb6rc/Hvg==}
     engines: {node: '>= 10'}
     cpu: [riscv64]
     os: [linux]
     libc: [glibc]
 
-  '@napi-rs/canvas-linux-x64-gnu@1.0.9':
-    resolution: {integrity: sha512-6kaz3w0QMy77PDWk6rJ1ksIihdad3qzEyX2o2oGT8GwCaypfT5mhjr8buOO5hstyLxcWXDScuz56RsINLtBPIQ==}
+  '@napi-rs/canvas-linux-x64-gnu@1.0.10':
+    resolution: {integrity: sha512-48HkZPQeAN/R+9NPpY64tceoyCUW5xYYtHKZnC+BG11qiihXJCbH+xfbgGU+OdYp1Q4s84HDl9ILU0KBK6SBOQ==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@napi-rs/canvas-linux-x64-musl@1.0.9':
-    resolution: {integrity: sha512-xrGvmS3v55hmZ86ls/kBLVNMUTYio3f6Ik0DireemG994VfPAwiA3ZXA0Uf1bByctkB3NQ1Sfb+H5bkdUnnzfQ==}
+  '@napi-rs/canvas-linux-x64-musl@1.0.10':
+    resolution: {integrity: sha512-QYHVi7WZ9v+Wm9OQyHLMTnJ8QiBPVX94BgbCHFJC/4bCFMfvX7fRzo4FJPgkRP0ISz3ulYNow/FCbQOPjzhYjg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@napi-rs/canvas-win32-arm64-msvc@1.0.9':
-    resolution: {integrity: sha512-yjmVS3ArZeRVCP7jqbPq4rpZa/BhTeI7ELE2XqJg3snICQBDevLZyArxswHkiTnT34KRic33/4fLirrHI+SY8A==}
+  '@napi-rs/canvas-win32-arm64-msvc@1.0.10':
+    resolution: {integrity: sha512-bWK+YajM/8sL0mMgLtug2s063FVBPzFV4QAn987CQomMKlmzrBY6Trz43KY+24hq7IOa3qNhUAgP/XMEF50ZEQ==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
 
-  '@napi-rs/canvas-win32-x64-msvc@1.0.9':
-    resolution: {integrity: sha512-QlSYQdMQslB81nlABo9wNfQ6npFhE7/O+saCZdqVGueGanyRk4jCogD5EwQenfP3kIq9e+mm6GreQBjX5MrA8g==}
+  '@napi-rs/canvas-win32-x64-msvc@1.0.10':
+    resolution: {integrity: sha512-9WtzW85PaIhtB27iXaR/9RrLCqHLbqD3Z8Q+kh17NjFxwQXFXU5vWbYH4vEH+drM307TTyK3hidZgpt09G5T3g==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
 
-  '@napi-rs/canvas@1.0.9':
-    resolution: {integrity: sha512-QviPdJImDi/jMAvBfqaw+19BndMd/sizXVW3NnpMd3VJGz++QXkOHcP9kWR/smHG0hNjHeyuHFyrx/5lD0oNcQ==}
+  '@napi-rs/canvas@1.0.10':
+    resolution: {integrity: sha512-V+qptzsGnPMFxEbhwc6eDNMe5eDrfiBIp8qGpuRjAVIX4Kn2zxvwQ1Xco6Fwe+3tYIe3iLW8LM9D+SvjyJhqbQ==}
     engines: {node: '>= 10'}
 
-  lefthook-darwin-arm64@2.1.15:
-    resolution: {integrity: sha512-6sNtlNsoeahxZySHbMMijFS8qB5nxZjMohO5t9x4UoM03sKAwXL++vR196mKOF942YdvkuDrwd+qyxfAU6QmWg==}
+  lefthook-darwin-arm64@2.1.16:
+    resolution: {integrity: sha512-oOjS1mn3UGNfo72UtR9VJMyulgbjvLkv5KEmJVgfWiO8wZ4Z469o2ZllvH5FrHluzv4Hlkc9OG+vnCP+5/ztMA==}
     cpu: [arm64]
     os: [darwin]
 
-  lefthook-darwin-x64@2.1.15:
-    resolution: {integrity: sha512-B2upzVBV/9adKe0fGUO4JCrgx/iKx3qC6PQ2N3Qrok9yL5wDx+AZ6L5GNNgAKUbUWP6XZywyZZ/DFTPLOGxA/Q==}
+  lefthook-darwin-x64@2.1.16:
+    resolution: {integrity: sha512-/thON8TbzsqXBjF0hkVPsisBJOKGfss0+lVqcJ0jNwaRDIQSn6Frsn7c9eqs7uyMNEQKUVLTeIkpwPrNldT8JA==}
     cpu: [x64]
     os: [darwin]
 
-  lefthook-freebsd-arm64@2.1.15:
-    resolution: {integrity: sha512-7PbO32jhKKHqRdD6DIucmQrZ5nHlXwhxHdqy6CxTH2wNNPlvjXPrMqb6W0SpHuOLS0dWdz77ZVJsOvwfH139AA==}
+  lefthook-freebsd-arm64@2.1.16:
+    resolution: {integrity: sha512-Eg7s0gcGwZnQqYyWTfOqb+2qupXtmHt/XHftXJvLhTaTMXR6uQbAyl7ceYTl2wH43AOCLrJ5BMMdqlWJaj/EbA==}
     cpu: [arm64]
     os: [freebsd]
 
-  lefthook-freebsd-x64@2.1.15:
-    resolution: {integrity: sha512-0XEgTQomWVV/uw4v5A/OMSfRk/9MRu3OBgTX1xF2QvUrb+fCEglkrJW299vSqndKn53MkUtyoIntz0ajw4PJlA==}
+  lefthook-freebsd-x64@2.1.16:
+    resolution: {integrity: sha512-vCmyKLO8mtAf+hm8rpfAlt4wQ23S7AGnlT6JlrLPBSt5V8J2kXuI/N1W2XQbWx6OqckqchhBdLQP3Xh4IiYBXA==}
     cpu: [x64]
     os: [freebsd]
 
-  lefthook-linux-arm64@2.1.15:
-    resolution: {integrity: sha512-HfgGoLtzqop68Zo9FDdP7rozFc+hv3xf2s4fWsyH50SbQLNgoKz/9vsneZG7n8bQ5YYGR/up0H9D8WQ7pou01g==}
+  lefthook-linux-arm64@2.1.16:
+    resolution: {integrity: sha512-zMEZ8x+PzXqjouEFsf2lWt2o0p5yvvT0YP0CpJC41y4FIRusx0sy3l+cjvKRIysLGOzKMr4V3/fE6w7f2KgwUw==}
     cpu: [arm64]
     os: [linux]
 
-  lefthook-linux-x64@2.1.15:
-    resolution: {integrity: sha512-oyhZn6koNmXvSlSQXeTL1Zmxmlp1ysInjZCETwfAhjGb5r42HX2coaPzO0e6dvoP6bqEO8cyWoqqj+FYVz9nig==}
+  lefthook-linux-x64@2.1.16:
+    resolution: {integrity: sha512-HdfNz3z5hzrEXyP5KC51os+2M6BThL4qMfu8rB777tbXzf7WMoxf/FV6mnzoqM1RN0K+KJAQYbnJatfPQhqusQ==}
     cpu: [x64]
     os: [linux]
 
-  lefthook-openbsd-arm64@2.1.15:
-    resolution: {integrity: sha512-/hF3ap8CUqD2whU127pesD0x0CLOymDmtR5NR5jbNrT/BryjxlL6YL7HL3KB1Xz3MZwBqYeLIceqFE9/Gc53xQ==}
+  lefthook-openbsd-arm64@2.1.16:
+    resolution: {integrity: sha512-zKkyN/ocUXOzFaLPn3ciucJ6CYcnUmqFsIwp7ge96sQ8l83omxL9rK0/KvSsMcus+TfHTNN+DFWVJxeMepPVtQ==}
     cpu: [arm64]
     os: [openbsd]
 
-  lefthook-openbsd-x64@2.1.15:
-    resolution: {integrity: sha512-IljStK5gOS8oQPxCsHNDoHeD8vSCDHFuHWtJfRbYWVtNMEA9/2shtIKHswFWQBAxltgt4/i/lN86rErKdDoIug==}
+  lefthook-openbsd-x64@2.1.16:
+    resolution: {integrity: sha512-Ptu0D2JK1COlDK1lcr7F6WDGkCzQ80ozeTrqNzPEyBjUdZAFLwR5K5gWgaRtR06RSoYDC72RFxKM1QYnsfF0rQ==}
     cpu: [x64]
     os: [openbsd]
 
-  lefthook-windows-arm64@2.1.15:
-    resolution: {integrity: sha512-S1HIhsM0RZua8fQlHzXFrF0CpA/eo2/UYVUAqU+pJ/3IBAq0ZpWG4ZzfrQiSSBbcG9LB4tJgqiJVtumQKO+ZgA==}
+  lefthook-windows-arm64@2.1.16:
+    resolution: {integrity: sha512-YTzFJwlF3qbHx+CCuiyDmDPASh6mYBp1I8zfTeGKI3L24Eoct6FUaGUlfAoz8SI3DECPmBhfNgAK4dZlX9Hd5g==}
     cpu: [arm64]
     os: [win32]
 
-  lefthook-windows-x64@2.1.15:
-    resolution: {integrity: sha512-cp4ZhMYpX9khKw+fu0JEskq0Aeo1csREkb4WTMmJaEL7KTt+Lpp5zzSPPa8NGtpcQSKUo+ZXYrtqzpxYpPdt0g==}
+  lefthook-windows-x64@2.1.16:
+    resolution: {integrity: sha512-mQVpfaagdIZPJCGDeedRnslyd9JTc13vjmp02uu4X7cr/VZK94obwk96dhgsRp9+LL1XMhX5zTcb0zNLo1hC+A==}
     cpu: [x64]
     os: [win32]
 
-  lefthook@2.1.15:
-    resolution: {integrity: sha512-l/BSlOZBou3zLDuSIV8V+kbNyC6UiFCACVHu8dVUCDxH5+8qZXmJr8iROruI/7hv6W7c3sVlVT+6+BpVhGZRmA==}
+  lefthook@2.1.16:
+    resolution: {integrity: sha512-U69YGDNsZ7R+umeSzdLzORNCHQFz/w4LKyNTjJQcGrQRQCr8hlCJfJwwm9sqq9Uc5N6dImS58ywURA0FkqoHlg==}
     hasBin: true
 
 snapshots:
 
-  '@napi-rs/canvas-android-arm64@1.0.9':
+  '@napi-rs/canvas-android-arm64@1.0.10':
     optional: true
 
-  '@napi-rs/canvas-darwin-arm64@1.0.9':
+  '@napi-rs/canvas-darwin-arm64@1.0.10':
     optional: true
 
-  '@napi-rs/canvas-darwin-x64@1.0.9':
+  '@napi-rs/canvas-darwin-x64@1.0.10':
     optional: true
 
-  '@napi-rs/canvas-linux-arm-gnueabihf@1.0.9':
+  '@napi-rs/canvas-linux-arm-gnueabihf@1.0.10':
     optional: true
 
-  '@napi-rs/canvas-linux-arm64-gnu@1.0.9':
+  '@napi-rs/canvas-linux-arm64-gnu@1.0.10':
     optional: true
 
-  '@napi-rs/canvas-linux-arm64-musl@1.0.9':
+  '@napi-rs/canvas-linux-arm64-musl@1.0.10':
     optional: true
 
-  '@napi-rs/canvas-linux-riscv64-gnu@1.0.9':
+  '@napi-rs/canvas-linux-riscv64-gnu@1.0.10':
     optional: true
 
-  '@napi-rs/canvas-linux-x64-gnu@1.0.9':
+  '@napi-rs/canvas-linux-x64-gnu@1.0.10':
     optional: true
 
-  '@napi-rs/canvas-linux-x64-musl@1.0.9':
+  '@napi-rs/canvas-linux-x64-musl@1.0.10':
     optional: true
 
-  '@napi-rs/canvas-win32-arm64-msvc@1.0.9':
+  '@napi-rs/canvas-win32-arm64-msvc@1.0.10':
     optional: true
 
-  '@napi-rs/canvas-win32-x64-msvc@1.0.9':
+  '@napi-rs/canvas-win32-x64-msvc@1.0.10':
     optional: true
 
-  '@napi-rs/canvas@1.0.9':
+  '@napi-rs/canvas@1.0.10':
     optionalDependencies:
-      '@napi-rs/canvas-android-arm64': 1.0.9
-      '@napi-rs/canvas-darwin-arm64': 1.0.9
-      '@napi-rs/canvas-darwin-x64': 1.0.9
-      '@napi-rs/canvas-linux-arm-gnueabihf': 1.0.9
-      '@napi-rs/canvas-linux-arm64-gnu': 1.0.9
-      '@napi-rs/canvas-linux-arm64-musl': 1.0.9
-      '@napi-rs/canvas-linux-riscv64-gnu': 1.0.9
-      '@napi-rs/canvas-linux-x64-gnu': 1.0.9
-      '@napi-rs/canvas-linux-x64-musl': 1.0.9
-      '@napi-rs/canvas-win32-arm64-msvc': 1.0.9
-      '@napi-rs/canvas-win32-x64-msvc': 1.0.9
+      '@napi-rs/canvas-android-arm64': 1.0.10
+      '@napi-rs/canvas-darwin-arm64': 1.0.10
+      '@napi-rs/canvas-darwin-x64': 1.0.10
+      '@napi-rs/canvas-linux-arm-gnueabihf': 1.0.10
+      '@napi-rs/canvas-linux-arm64-gnu': 1.0.10
+      '@napi-rs/canvas-linux-arm64-musl': 1.0.10
+      '@napi-rs/canvas-linux-riscv64-gnu': 1.0.10
+      '@napi-rs/canvas-linux-x64-gnu': 1.0.10
+      '@napi-rs/canvas-linux-x64-musl': 1.0.10
+      '@napi-rs/canvas-win32-arm64-msvc': 1.0.10
+      '@napi-rs/canvas-win32-x64-msvc': 1.0.10
 
-  lefthook-darwin-arm64@2.1.15:
+  lefthook-darwin-arm64@2.1.16:
     optional: true
 
-  lefthook-darwin-x64@2.1.15:
+  lefthook-darwin-x64@2.1.16:
     optional: true
 
-  lefthook-freebsd-arm64@2.1.15:
+  lefthook-freebsd-arm64@2.1.16:
     optional: true
 
-  lefthook-freebsd-x64@2.1.15:
+  lefthook-freebsd-x64@2.1.16:
     optional: true
 
-  lefthook-linux-arm64@2.1.15:
+  lefthook-linux-arm64@2.1.16:
     optional: true
 
-  lefthook-linux-x64@2.1.15:
+  lefthook-linux-x64@2.1.16:
     optional: true
 
-  lefthook-openbsd-arm64@2.1.15:
+  lefthook-openbsd-arm64@2.1.16:
     optional: true
 
-  lefthook-openbsd-x64@2.1.15:
+  lefthook-openbsd-x64@2.1.16:
     optional: true
 
-  lefthook-windows-arm64@2.1.15:
+  lefthook-windows-arm64@2.1.16:
     optional: true
 
-  lefthook-windows-x64@2.1.15:
+  lefthook-windows-x64@2.1.16:
     optional: true
 
-  lefthook@2.1.15:
+  lefthook@2.1.16:
     optionalDependencies:
-      lefthook-darwin-arm64: 2.1.15
-      lefthook-darwin-x64: 2.1.15
-      lefthook-freebsd-arm64: 2.1.15
-      lefthook-freebsd-x64: 2.1.15
-      lefthook-linux-arm64: 2.1.15
-      lefthook-linux-x64: 2.1.15
-      lefthook-openbsd-arm64: 2.1.15
-      lefthook-openbsd-x64: 2.1.15
-      lefthook-windows-arm64: 2.1.15
-      lefthook-windows-x64: 2.1.15
+      lefthook-darwin-arm64: 2.1.16
+      lefthook-darwin-x64: 2.1.16
+      lefthook-freebsd-arm64: 2.1.16
+      lefthook-freebsd-x64: 2.1.16
+      lefthook-linux-arm64: 2.1.16
+      lefthook-linux-x64: 2.1.16
+      lefthook-openbsd-arm64: 2.1.16
+      lefthook-openbsd-x64: 2.1.16
+      lefthook-windows-arm64: 2.1.16
+      lefthook-windows-x64: 2.1.16
