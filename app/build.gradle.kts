@@ -35,7 +35,7 @@ android {
         versionCode = 4
         versionName = "1.2.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "io.github.scottlz0310.shoptools.HiltTestRunner"
     }
 
     buildTypes {
@@ -105,4 +105,18 @@ dependencies {
 
     // Tests
     testImplementation(libs.junit)
+
+    // Instrumentation tests (Compose UI)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.ui.test.junit4)
+    // compose-ui-test が引く espresso-core 3.5.0 は、API 37 で廃止された隠し API
+    // (InputManager.getInstance) を呼び NoSuchMethodException になるため 3.7.0 に固定する。
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.hilt.android.testing)
+    // Hilt の生成 Java ソースが参照するコンパイル時専用 annotation（main と同じ理由）。
+    androidTestCompileOnly(libs.errorprone.annotations)
+    kspAndroidTest(libs.hilt.compiler)
+    debugImplementation(libs.compose.ui.test.manifest)
 }

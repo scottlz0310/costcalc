@@ -11,6 +11,11 @@
 - CI に Android Lint (`:app:lintDebug`) ジョブを追加 (#77)
 - `renovate.json` に `options/android-sdk` プリセットを追加し、`compileSdk` / `targetSdk` の更新 PR を提案させる (#77)
 - テーマアイコン用のモノクロアイコン `ic_launcher_monochrome.xml` を追加 (#77)
+- Compose UI テスト（`app/src/androidTest`）を新設 (#77)
+  - 3 画面（単価比較 / 切手 / 設定）のボトムナビ遷移と、テキストがステータスバー・ナビゲーションバーと重ならないことを検証
+  - Hilt テスト用ランナー `HiltTestRunner` を追加し、`testInstrumentationRunner` を差し替え
+  - `compose-ui-test-junit4` / `hilt-android-testing` / `androidx.test` 系を追加。`espresso-core` は API 37 で廃止された隠し API を呼ぶ 3.5.0 を避けるため 3.7.0 に固定
+- `android-ui-tests.yml` を追加。API 37 エミュレータで UI テストを実行（`app/**` 等の変更を含む PR と手動実行）(#77)
 
 ### 修正
 - CameraX の実験的 API 利用箇所に `@OptIn` を付与し、`UnsafeOptInUsageError` 15 件を解消 (#77)
