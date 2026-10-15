@@ -152,7 +152,7 @@ lefthook は `devDependencies` で管理しており、`pnpm install` の `prepa
 `app/src/androidTest` の Compose UI テストは、エミュレータ上で実行する。`targetSdk` 引き上げによる
 edge-to-edge / WindowInsets の挙動変化は、コンパイルにも JVM ユニットテストにも現れないため、これが唯一の検知手段になる。
 
-- **CI**（`android-ui-tests.yml`）: API 36 のエミュレータで実行する（必須）。API 37 は Linux CI のエミュレータが不安定なため非必須（#101）
+- **CI**（`android-ui-tests.yml`）: API 36 のエミュレータで実行する（必須）。API 37 は Linux CI のエミュレータが不安定なため非必須（#101）。週次でも実行し、API 37 が全件成功したら #101 に通知する（必須化を判断する契機）
 - **ローカル**: `targetSdk` を変更する PR は、API 37 のエミュレータで実行して結果を PR に残す（下記）
 
 ```powershell

@@ -39,6 +39,16 @@ jobs:
           path: app/build/reports/tests/
           retention-days: 14
 
+  script-tests:
+    name: シェルスクリプトのテスト
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: 通知スクリプトのテストを実行
+        run: bash .github/scripts/test/notify-api37-green.test.sh
+
   android-lint:
     name: Android Lint
     runs-on: ubuntu-latest
