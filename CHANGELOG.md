@@ -34,6 +34,10 @@
 - メニューにグラフィックを追加 (#81)
   - ヘッダーに、ストア掲載と同じバナーを表示。`assets/feature-graphic.jpg` から `scripts/generate_menu_banner.mjs`（`pnpm gen-menu-banner`）で WebP に変換する
   - 各機能のカードに、Vector Drawable のイラスト（単価比較: カートと値札、切手: 封筒と切手）を表示。`ToolFeature` の `icon` を `graphicRes` に置き換え、新しい機能はイラストを添えて追加する
+- ストア掲載用に、新しい UI（メニュー・単価比較・切手・設定）のスクリーンショットを追加 (#112)
+  - `StoreScreenshotsTest`（`androidTest`）が、画面の状態をセットして撮影する。通常のテスト実行では何もせずに成功し、`captureScreenshots=true` を渡したときだけ撮影する。システムバーを除いた、アプリの画面だけを保存する
+  - `assets/screenshot/v1.3/` に追加。`scripts/generate_play_assets.mjs` が、版ごとのディレクトリを 9:16（1440×2560）へ整形する。v1.2.0 用の元画像は、公開済みのリリースノートが参照しているため、変更しない
+  - 撮り直し方と、入稿する 5 枚の構成は、`docs/play-store-listing.md` に記載。Play Console への入稿は手作業
 
 ### 変更
 - ナビゲーションをボトムナビからハブ＆スポーク型へ移行 (#81)
