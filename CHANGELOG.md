@@ -42,6 +42,9 @@
   - Android 17 を対象とするアプリの挙動変更（`MessageQueue` のリフレクション・`static final` フィールドへの書き込み・CJKV 入力のアクセシビリティ）に対し、API 37 エミュレータ上でアプリの起動・3 画面の表示と遷移・システムバーとの非重なり（UI テスト 6 件）とユニットテスト 42 件が通ることを確認。カメラ・OCR は実機未検証
 - Android Lint の `OldTargetApi` / `ExpiredTargetSdkVersion` を error に昇格 (#77)
   - 既定の Warning では `targetSdk` が古くなっても CI が落ちない。新しい Android API が出ると CI（Android Lint）が赤くなり、引き上げの検証を促す
+- minSdk = 26 で使われないレガシーのランチャーアイコン PNG（`ic_launcher.png` / `ic_launcher_round.png`）を削除
+  - アイコンは全密度で、アダプティブアイコンの XML（`mipmap-anydpi`）に解決されており、PNG は実際には使われていなかった
+  - XML と PNG の併存は `IconXmlAndPng` の警告になる（新しい画像リソースの追加を契機に lint が検出する）。`scripts/generate_icons.mjs` も PNG を生成しないよう変更
 
 ### 修正
 - Play 公開後の実態に合わせてドキュメントを更新

@@ -13,8 +13,6 @@
  *   - icon_source.png が正方形でない場合は中央を基準にクロップして処理する
  *
  * 出力:
- *   - app/src/main/res/mipmap-[density]/ic_launcher.png（各解像度）
- *   - app/src/main/res/mipmap-[density]/ic_launcher_round.png（同上・丸マスク適用）
  *   - app/src/main/res/mipmap-[density]/ic_launcher_foreground_full.png（アダプティブアイコン用・108dp相当）
  *   - app/src/main/res/mipmap-anydpi/ic_launcher.xml（アダプティブアイコン設定。monochrome は手書きの drawable/ic_launcher_monochrome.xml を参照）
  *   - play_store_icon.png（512×512・Play Store 提出用）
@@ -28,13 +26,14 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 
-// Android 各解像度のアイコンサイズ（px）
+// アダプティブアイコンのフォアグラウンドの各解像度のサイズ（px）。
+// minSdk = 26 のため、レガシー用の ic_launcher.png / ic_launcher_round.png は持たない。
 const SIZES = [
-  { dir: 'mipmap-mdpi',    size: 48,  adaptiveSize: 108 },
-  { dir: 'mipmap-hdpi',    size: 72,  adaptiveSize: 162 },
-  { dir: 'mipmap-xhdpi',   size: 96,  adaptiveSize: 216 },
-  { dir: 'mipmap-xxhdpi',  size: 144, adaptiveSize: 324 },
-  { dir: 'mipmap-xxxhdpi', size: 192, adaptiveSize: 432 },
+  { dir: 'mipmap-mdpi',    adaptiveSize: 108 },
+  { dir: 'mipmap-hdpi',    adaptiveSize: 162 },
+  { dir: 'mipmap-xhdpi',   adaptiveSize: 216 },
+  { dir: 'mipmap-xxhdpi',  adaptiveSize: 324 },
+  { dir: 'mipmap-xxxhdpi', adaptiveSize: 432 },
 ];
 
 const PLAY_STORE_SIZE = 512;
@@ -88,36 +87,14 @@ async function resize(img, size) {
   return canvas.toBuffer('image/png');
 }
 
-/**
- * 丸マスクを適用して PNG バッファを返す
- */
-async function resizeRound(img, size) {
-  const scaled = stepDownscale(img, size);
-  const canvas = createCanvas(size, size);
-  const ctx = canvas.getContext('2d');
-  const r = size / 2;
-  ctx.beginPath();
-  ctx.arc(r, r, r, 0, Math.PI * 2);
-  ctx.closePath();
-  ctx.clip();
-  ctx.drawImage(scaled, 0, 0, size, size);
-  return canvas.toBuffer('image/png');
-}
-
 async function main() {
   console.log(`ソース画像を読み込み中: ${SRC}`);
   const img = await loadImage(SRC);
   console.log(`元画像サイズ: ${img.width}×${img.height}`);
 
-  for (const { dir, size, adaptiveSize } of SIZES) {
+  for (const { dir, adaptiveSize } of SIZES) {
     const outDir = join(RES, dir);
     mkdirSync(outDir, { recursive: true });
-
-    const square = await resize(img, size);
-    writeFileSync(join(outDir, 'ic_launcher.png'), square);
-
-    const round = await resizeRound(img, size);
-    writeFileSync(join(outDir, 'ic_launcher_round.png'), round);
 
     // アダプティブアイコン用フォアグラウンド（108dp 相当、セーフゾーン 72/108 に収める）
     const fgCanvas = createCanvas(adaptiveSize, adaptiveSize);
@@ -131,7 +108,7 @@ async function main() {
     fgCtx.drawImage(scaledCanvas, offset, offset, iconSize, iconSize);
     writeFileSync(join(outDir, 'ic_launcher_foreground_full.png'), fgCanvas.toBuffer('image/png'));
 
-    console.log(`  ✓ ${dir} (${size}×${size}, adaptive foreground ${adaptiveSize}×${adaptiveSize})`);
+    console.log(`  ✓ ${dir} (adaptive foreground ${adaptiveSize}×${adaptiveSize})`);
   }
 
   // Play Store 用 512×512
