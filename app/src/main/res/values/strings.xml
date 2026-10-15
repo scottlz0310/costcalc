@@ -19,8 +19,6 @@
     <string name="hint_stock">枚数</string>
     <string name="hint_target">目標金額（円）</string>
     <string name="label_unit_price">円 / unit</string>
-    <string name="label_total">合計</string>
-    <string name="label_diff">差分</string>
     <string name="label_pieces">枚</string>
     <string name="btn_add">追加</string>
     <string name="btn_calculate">計算</string>

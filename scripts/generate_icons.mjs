@@ -16,7 +16,7 @@
  *   - app/src/main/res/mipmap-[density]/ic_launcher.png（各解像度）
  *   - app/src/main/res/mipmap-[density]/ic_launcher_round.png（同上・丸マスク適用）
  *   - app/src/main/res/mipmap-[density]/ic_launcher_foreground_full.png（アダプティブアイコン用・108dp相当）
- *   - app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml（アダプティブアイコン設定）
+ *   - app/src/main/res/mipmap-anydpi/ic_launcher.xml（アダプティブアイコン設定。monochrome は手書きの drawable/ic_launcher_monochrome.xml を参照）
  *   - play_store_icon.png（512×512・Play Store 提出用）
  */
 
@@ -139,18 +139,19 @@ async function main() {
   writeFileSync(join(ROOT, 'play_store_icon.png'), playStore);
   console.log(`  ✓ play_store_icon.png (512×512)`);
 
-  // anydpi-v26 アダプティブアイコン XML
-  const anydpiDir = join(RES, 'mipmap-anydpi-v26');
+  // anydpi アダプティブアイコン XML（minSdk = 26 のため -v26 修飾は不要）
+  const anydpiDir = join(RES, 'mipmap-anydpi');
   mkdirSync(anydpiDir, { recursive: true });
   const adaptiveXml = `<?xml version="1.0" encoding="utf-8"?>
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@android:color/transparent" />
     <foreground android:drawable="@mipmap/ic_launcher_foreground_full" />
+    <monochrome android:drawable="@drawable/ic_launcher_monochrome" />
 </adaptive-icon>
 `;
   writeFileSync(join(anydpiDir, 'ic_launcher.xml'), adaptiveXml);
   writeFileSync(join(anydpiDir, 'ic_launcher_round.xml'), adaptiveXml);
-  console.log(`  ✓ mipmap-anydpi-v26/ic_launcher*.xml`);
+  console.log(`  ✓ mipmap-anydpi/ic_launcher*.xml`);
 
   console.log('\n完了！');
 }
