@@ -7,7 +7,8 @@ name: Android UI Tests
 # surfaceflinger 等が abort して使い物にならない（原因・証跡・戻す条件は #101）。
 # そのため API 36 を必須、API 37 を非必須（失敗しても CI を落とさず警告のみ）で併走させる。
 # API 37 が安定して緑になったら #101 の手順で必須化する。
-# targetSdk 引き上げ PR は、CI の API 36 だけでは検証できないため手元の API 37 エミュレータでも実行すること。
+# targetSdk 引き上げ PR は、CI の API 36 だけでは検証できないため scripts/run-ui-tests-local.ps1 で
+# 手元の API 37 エミュレータでも実行し、結果を commit status として PR に残すこと（README 参照）。
 on:
   pull_request:
     branches: [main]
