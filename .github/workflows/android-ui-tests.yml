@@ -31,24 +31,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - variant: no-gldma
+          - variant: playstore-image
             api_level: '37.0'
-            options: -gpu swiftshader_indirect -feature -GLDMA,-GLDMA2
-            emulator_build: ''
-            three_button_nav: ''
-          - variant: three-button-nav
-            api_level: '37.0'
+            target: google_apis_playstore
             options: -gpu swiftshader_indirect
             emulator_build: ''
-            three_button_nav: '1'
-          - variant: emulator-37.1.11
-            api_level: '37.0'
-            options: -gpu swiftshader_indirect
-            emulator_build: '15917651'
             three_button_nav: ''
-          - variant: api-36 (control)
-            api_level: '36'
-            options: -gpu swiftshader_indirect
+          - variant: gpu-off
+            api_level: '37.0'
+            target: google_apis
+            options: -gpu off
             emulator_build: ''
             three_button_nav: ''
 
@@ -89,7 +81,7 @@ jobs:
           # 引用符を外すと YAML が数値 37 に丸め、platforms;android-37 が見つからず失敗する。
           api-level: ${{ matrix.api_level }}
           arch: x86_64
-          target: google_apis
+          target: ${{ matrix.target }}
           profile: pixel_6
           # 未指定だと /data が約 800MB しか無く、APK インストール時に容量不足で system_server が不安定になる。
           disk-size: 6000M
