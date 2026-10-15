@@ -49,6 +49,12 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      # エミュレータ起動と同時に Gradle のコンパイルを走らせると CPU を奪い合い、system_server が
+      # 落ちて再起動を繰り返す（package サービスが見つからずインストール不能になる）。
+      # APK のビルドを先に済ませ、エミュレータ起動後はインストールとテスト実行だけにする。
+      - name: APK をビルド
+        run: ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest --no-daemon
+
       - name: UI テストを実行
         uses: reactivecircus/android-emulator-runner@v2
         with:
