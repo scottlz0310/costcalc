@@ -21,26 +21,36 @@ concurrency:
 
 jobs:
   android-ui:
-    name: Android UI Test (API 37, ${{ matrix.variant }})
+    name: Android UI Test (${{ matrix.variant }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      UI_TEST_THREE_BUTTON_NAV: ${{ matrix.three_button_nav }}
     # 【一時的な切り分け実験】surfaceflinger の abort を避けられる GPU モード／エミュレータ版を比較する。
     strategy:
       fail-fast: false
       matrix:
         include:
-          - variant: swiftshader (control)
-            gpu: swiftshader_indirect
+          - variant: no-gldma
+            api_level: '37.0'
+            options: -gpu swiftshader_indirect -feature -GLDMA,-GLDMA2
             emulator_build: ''
-          - variant: swangle
-            gpu: swangle_indirect
+            three_button_nav: ''
+          - variant: three-button-nav
+            api_level: '37.0'
+            options: -gpu swiftshader_indirect
             emulator_build: ''
-          - variant: guest
-            gpu: guest
-            emulator_build: ''
+            three_button_nav: '1'
           - variant: emulator-37.1.11
-            gpu: swiftshader_indirect
+            api_level: '37.0'
+            options: -gpu swiftshader_indirect
             emulator_build: '15917651'
+            three_button_nav: ''
+          - variant: api-36 (control)
+            api_level: '36'
+            options: -gpu swiftshader_indirect
+            emulator_build: ''
+            three_button_nav: ''
 
     steps:
       - uses: actions/checkout@v7
@@ -77,7 +87,7 @@ jobs:
         with:
           # SDK 上のパッケージ名が android-37.0 のため "37.0" を指定する（platform・system image 共通）。
           # 引用符を外すと YAML が数値 37 に丸め、platforms;android-37 が見つからず失敗する。
-          api-level: '37.0'
+          api-level: ${{ matrix.api_level }}
           arch: x86_64
           target: google_apis
           profile: pixel_6
@@ -88,13 +98,13 @@ jobs:
           ram-size: 4096M
           disable-animations: true
           emulator-build: ${{ matrix.emulator_build }}
-          emulator-options: -no-window -gpu ${{ matrix.gpu }} -noaudio -no-boot-anim
+          emulator-options: -no-window ${{ matrix.options }} -noaudio -no-boot-anim
           script: bash .github/scripts/run-ui-tests.sh
 
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: android-ui-test-report-${{ github.run_number }}-${{ matrix.gpu }}-${{ matrix.emulator_build || 'latest' }}
+          name: android-ui-test-report-${{ github.run_number }}-${{ strategy.job-index }}
           # ui-test-diagnostics: run-ui-tests.sh が残す証跡（連続 logcat・dropbox のクラッシュ記録・
           # 試行ごとの状態と結果）。テストが走らなかった場合の原因調査に使う。
           path: |

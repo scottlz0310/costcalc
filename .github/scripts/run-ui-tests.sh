@@ -95,6 +95,11 @@ trap finish EXIT
 
 start_live_logcat
 
+# 【一時的な切り分け実験】RegionSampling（ナビバーのジェスチャーピル）を避けるため 3 ボタンナビへ切り替える。
+if [ "${UI_TEST_THREE_BUTTON_NAV:-}" = "1" ] && has_adb; then
+  adb shell cmd overlay enable com.android.internal.systemui.navbar.threebutton || true
+fi
+
 for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
   rm -rf "$RESULTS_DIR"
   # スタブ実行（adb 無し）ではスキップできるよう、adb が使える場合のみ待つ。
