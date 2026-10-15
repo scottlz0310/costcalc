@@ -22,6 +22,23 @@ sum_attr() {
   echo "$total"
 }
 
+# system_server が安定するまで待つ。boot_completed 直後は package サービスが一時的に消えることがある。
+# 連続して応答した場合のみ準備完了とみなす（起動・クラッシュ・再起動の途中を拾わないため）。
+wait_for_system_ready() {
+  local ok=0 i
+  for i in $(seq 1 90); do
+    if adb shell pm path android >/dev/null 2>&1 && adb shell cmd activity get-current-user >/dev/null 2>&1; then
+      ok=$((ok + 1))
+    else
+      ok=0
+    fi
+    [ "$ok" -ge 5 ] && return 0
+    sleep 2
+  done
+  echo "::warning::エミュレータの system_server が 3 分以内に安定しなかった"
+  return 1
+}
+
 # テストが走らなかった原因（容量・AppOps・システムログ）を CI ログに残す。診断自体の失敗は無視する。
 dump_diagnostics() {
   echo "::group::エミュレータ診断"
@@ -37,6 +54,8 @@ dump_diagnostics() {
 
 for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
   rm -rf "$RESULTS_DIR"
+  # スタブ実行（adb 無し）ではスキップできるよう、adb が使える場合のみ待つ。
+  if command -v adb >/dev/null 2>&1; then wait_for_system_ready || true; fi
   status=0
   # shellcheck disable=SC2086
   $GRADLE_CMD || status=$?

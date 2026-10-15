@@ -60,8 +60,11 @@ jobs:
           profile: pixel_6
           # 未指定だと /data が約 800MB しか無く、APK インストール時に容量不足で system_server が不安定になる。
           disk-size: 6000M
+          # 既定（2 コア・2GB）では API 37 イメージの system_server が起動後に落ちて再起動を繰り返す。
+          cores: 4
+          ram-size: 4096M
           disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -memory 2048
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           script: bash .github/scripts/run-ui-tests.sh
 
       - uses: actions/upload-artifact@v7
