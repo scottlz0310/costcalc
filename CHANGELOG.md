@@ -47,6 +47,11 @@
 - minSdk = 26 で使われないレガシーのランチャーアイコン PNG（`ic_launcher.png` / `ic_launcher_round.png`）を削除
   - アイコンは全密度で、アダプティブアイコンの XML（`mipmap-anydpi`）に解決されており、PNG は実際には使われていなかった
   - XML と PNG の併存は `IconXmlAndPng` の警告になる（新しい画像リソースの追加を契機に lint が検出する）。`scripts/generate_icons.mjs` も PNG を生成しないよう変更
+- ktlint の版の定義を、リポジトリ直下の `.ktlint-version` の 1 か所にまとめた (#109)
+  - CI とローカルで版が食い違い（CI 1.8.0・ローカル 1.5.0）、ローカルでは通るのに CI で落ちていた。CI も、ローカルの pre-commit（lefthook）も、同じ `scripts/ktlint.sh` を使う。必要なら `scripts/install-ktlint.sh` でインストールし、**PATH ではなくインストール先のバイナリを実行する**（PATH の前方に別の版があっても、版が食い違わない）
+  - ダウンロードしたバイナリは、GitHub のリリースアセットの digest（SHA-256）と実行時に照合する（版の更新で SHA を手で書き換えない）。`jq` が必要
+  - Renovate が `.ktlint-version` を追従する（`renovate.json` に regex マネージャーを追加。renovate-config にプリセットができたら削除する）。以前の `ci.yml` の `# renovate:` コメントは機能していなかった（renovate-config#283）
+  - インストールスクリプトとラッパーの分岐テストを追加し、CI で実行
 
 ### 修正
 - ステータスバーのアイコンが白く、ライトな背景に重なって読みにくい問題を修正 (#107)

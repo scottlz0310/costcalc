@@ -9,5 +9,15 @@
     "github>scottlz0310/renovate-config//presets/options/schedule",
     "github>scottlz0310/renovate-config//presets/options/security",
     "github>scottlz0310/renovate-config//presets/options/android-sdk"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "ktlint の版（.ktlint-version）。CI とローカルのインストールスクリプトが共有する。renovate-config 側にプリセットができたら、ここは削除する",
+      "managerFilePatterns": ["/(^|/)\\.ktlint-version$/"],
+      "matchStrings": ["(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
+      "depNameTemplate": "pinterest/ktlint",
+      "datasourceTemplate": "github-releases"
+    }
   ]
 }
