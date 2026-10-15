@@ -1,7 +1,9 @@
 package io.github.scottlz0310.shoptools.feature.unitprice.ui.ocr
 
 import android.graphics.RectF
+import androidx.annotation.OptIn
 import androidx.camera.core.ImageProxy
+import androidx.camera.view.TransformExperimental
 import androidx.camera.view.transform.CoordinateTransform
 import androidx.camera.view.transform.ImageProxyTransformFactory
 import androidx.camera.view.transform.OutputTransform
@@ -10,6 +12,7 @@ import androidx.camera.view.transform.OutputTransform
  * CameraX の座標変換を担うクラス。
  * Android / CameraX 依存はここに集約し、他のクラスに漏らさない。
  */
+@OptIn(TransformExperimental::class)
 object OcrCoordinateMapper {
     // setUsingRotationDegrees(true) で ImageProxy の rotation を変換に反映する。
     // デフォルト false のままだと縦持ち端末（rotationDegrees=90/270）で

@@ -7,6 +7,16 @@
 
 ## [Unreleased]
 
+### 追加
+- CI に Android Lint (`:app:lintDebug`) ジョブを追加 (#77)
+- `renovate.json` に `options/android-sdk` プリセットを追加し、`compileSdk` / `targetSdk` の更新 PR を提案させる (#77)
+- テーマアイコン用のモノクロアイコン `ic_launcher_monochrome.xml` を追加 (#77)
+
+### 修正
+- CameraX の実験的 API 利用箇所に `@OptIn` を付与し、`UnsafeOptInUsageError` 15 件を解消 (#77)
+- 未使用リソース（`ic_launcher_background` / `ic_launcher_foreground` / `label_total` / `label_diff`）を削除 (#77)
+- `mipmap-anydpi-v26` を `mipmap-anydpi` へ改名（`minSdk = 26` のため修飾が不要）。`generate_icons.mjs` の出力先と monochrome 参照も追随 (#77)
+
 ---
 
 ## [1.2.0] - 2026-09-06
