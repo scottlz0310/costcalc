@@ -58,6 +58,8 @@ jobs:
           arch: x86_64
           target: google_apis
           profile: pixel_6
+          # 未指定だと /data が約 800MB しか無く、APK インストール時に容量不足で system_server が不安定になる。
+          disk-size: 6000M
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -memory 2048
           script: bash .github/scripts/run-ui-tests.sh
