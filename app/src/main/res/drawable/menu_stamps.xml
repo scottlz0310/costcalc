@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- メニューの「切手」カードのイラスト: 封筒と切手。 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="96"
+    android:viewportHeight="96">
+    <!-- 背景の円 -->
+    <path
+        android:fillColor="#EDD9FF"
+        android:pathData="M48,48m-44,0a44,44 0,1 1,88 0a44,44 0,1 1,-88 0" />
+    <!-- 封筒 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#7B4F9E"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round"
+        android:pathData="M14,34 L82,34 L82,74 L14,74 Z" />
+    <!-- 封筒のふた -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#7B4F9E"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M14,34 L48,58 L82,34" />
+    <!-- 宛名の線 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#C9A9E0"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M22,68 L40,68" />
+    <!-- 切手 -->
+    <path
+        android:fillColor="#FFD6E4"
+        android:strokeColor="#D63384"
+        android:strokeWidth="2.5"
+        android:strokeLineJoin="round"
+        android:pathData="M58,12 L82,12 L82,40 L58,40 Z" />
+    <!-- 切手の絵柄（山と太陽） -->
+    <path
+        android:fillColor="#D63384"
+        android:pathData="M61,37 L69,22 L75,31 L79,26 L79,37 Z" />
+    <path
+        android:fillColor="#D63384"
+        android:pathData="M74,18m-2.4,0a2.4,2.4 0,1 1,4.8 0a2.4,2.4 0,1 1,-4.8 0" />
+</vector>

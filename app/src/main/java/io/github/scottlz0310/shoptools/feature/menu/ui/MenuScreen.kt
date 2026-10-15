@@ -1,5 +1,6 @@
 package io.github.scottlz0310.shoptools.feature.menu.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,14 +9,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.scottlz0310.shoptools.R
@@ -34,6 +38,15 @@ fun MenuScreen(
                 .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        Image(
+            painter = painterResource(R.drawable.menu_banner),
+            contentDescription = stringResource(R.string.menu_banner_description),
+            contentScale = ContentScale.FillWidth,
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp)),
+        )
         Text(
             text = stringResource(R.string.menu_tagline),
             style = MaterialTheme.typography.bodyLarge,
@@ -56,11 +69,11 @@ private fun FeatureCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Icon(
-                imageVector = feature.icon,
+            // タイトルと説明で内容が伝わるため、イラストは装飾として扱う。
+            Image(
+                painter = painterResource(feature.graphicRes),
                 contentDescription = null,
-                modifier = Modifier.size(40.dp),
-                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(72.dp),
             )
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
