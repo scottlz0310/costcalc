@@ -77,8 +77,11 @@ jobs:
         if: always()
         with:
           name: android-ui-test-report-${{ github.run_number }}
+          # ui-test-diagnostics: run-ui-tests.sh が残す証跡（連続 logcat・dropbox のクラッシュ記録・
+          # 試行ごとの状態と結果）。テストが走らなかった場合の原因調査に使う。
           path: |
             app/build/reports/androidTests/connected
             app/build/outputs/androidTest-results/connected
+            ui-test-diagnostics
           if-no-files-found: warn
           retention-days: 14
