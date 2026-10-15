@@ -39,6 +39,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Codecov へ送るユニットテストのカバレッジ（createDebugUnitTestCoverageReport）を出力する。
+            enableUnitTestCoverage = true
+        }
         release {
             isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("release")

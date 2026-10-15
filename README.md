@@ -4,6 +4,8 @@
 
 Android アプリ（Kotlin + Jetpack Compose）
 
+[![codecov](https://codecov.io/gh/scottlz0310/costcalc/graph/badge.svg)](https://codecov.io/gh/scottlz0310/costcalc)
+
 ---
 
 ## 配布
@@ -51,7 +53,12 @@ cd costcalc
 
 # テスト実行
 ./gradlew test
+
+# カバレッジレポート（ユニットテスト由来。app/build/reports/coverage/test/debug/report.xml）
+./gradlew :app:createDebugUnitTestCoverageReport
 ```
+
+カバレッジは CI で [Codecov](https://codecov.io/gh/scottlz0310/costcalc) へ送信している。数値は情報提供で、閾値による CI の失敗は設けていない（設定は `codecov.yml`）。
 
 ### Android SDK セットアップ（Android Studio なしの場合）
 
