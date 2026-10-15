@@ -8,20 +8,48 @@ import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 
-/** メニューから各画面へ到達する方法。 */
+/** 起動直後のメニューから、ある画面へ到達する方法。 */
 sealed interface Entry {
+    fun open(
+        rule: ComposeContentTestRule,
+        context: Context,
+    )
+
     /** 起動直後に表示されている（メニュー自身）。 */
-    data object None : Entry
+    data object None : Entry {
+        override fun open(
+            rule: ComposeContentTestRule,
+            context: Context,
+        ) = Unit
+    }
 
     /** メニューの機能カード（タイトルのテキストを持つ）をタップする。 */
     data class Card(
         @StringRes val title: Int,
-    ) : Entry
+    ) : Entry {
+        override fun open(
+            rule: ComposeContentTestRule,
+            context: Context,
+        ) {
+            rule
+                .onNode(hasText(context.getString(title)) and hasClickAction())
+                .performClick()
+        }
+    }
 
     /** TopAppBar のアクション（contentDescription を持つアイコン）をタップする。 */
     data class Action(
         @StringRes val contentDescription: Int,
-    ) : Entry
+    ) : Entry {
+        override fun open(
+            rule: ComposeContentTestRule,
+            context: Context,
+        ) {
+            rule
+                .onNodeWithContentDescription(context.getString(contentDescription))
+                .performClick()
+        }
+    }
 }
 
 /**
@@ -43,17 +71,7 @@ enum class ScreenCase(
         rule: ComposeContentTestRule,
         context: Context,
     ) {
-        when (val e = entry) {
-            Entry.None -> Unit
-            is Entry.Card ->
-                rule
-                    .onNode(hasText(context.getString(e.title)) and hasClickAction())
-                    .performClick()
-            is Entry.Action ->
-                rule
-                    .onNodeWithContentDescription(context.getString(e.contentDescription))
-                    .performClick()
-        }
+        entry.open(rule, context)
         rule.waitForIdle()
     }
 
