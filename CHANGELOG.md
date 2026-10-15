@@ -54,7 +54,7 @@
 - ktlint の版の定義を、リポジトリ直下の `.ktlint-version` の 1 か所にまとめた (#109)
   - CI とローカルで版が食い違い（CI 1.8.0・ローカル 1.5.0）、ローカルでは通るのに CI で落ちていた。CI も、ローカルの pre-commit（lefthook）も、同じ `scripts/ktlint.sh` を使う。必要なら `scripts/install-ktlint.sh` でインストールし、**PATH ではなくインストール先のバイナリを実行する**（PATH の前方に別の版があっても、版が食い違わない）
   - ダウンロードしたバイナリは、GitHub のリリースアセットの digest（SHA-256）と実行時に照合する（版の更新で SHA を手で書き換えない）。`jq` が必要
-  - Renovate が `.ktlint-version` を追従する（`renovate.json` に regex マネージャーを追加。renovate-config にプリセットができたら削除する）。以前の `ci.yml` の `# renovate:` コメントは機能していなかった（renovate-config#283）
+  - Renovate が `.ktlint-version` を追従する。以前の `ci.yml` の `# renovate:` コメントは機能していなかった（renovate-config#283）。検出ルールは renovate-config の `languages/android` にあり、`renovate.json` にはローカル定義を持たない（renovate-config#284）
   - インストールスクリプトとラッパーの分岐テストを追加し、CI で実行
 
 ### 修正
