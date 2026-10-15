@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # エミュレータ上で UI テストを実行し、「テストが実際に走って全件成功した」ことを結果 XML で判定する。
 #
-# エミュレータは sys.boot_completed の後も system_server の初期化が続き、この間の APK インストールは
-# SecurityException (GET_USAGE_STATS) で失敗する。このとき AGP は警告ログだけで BUILD SUCCESSFUL を返し、
-# テストが 1 件も走らないまま CI が緑になる。そのため Gradle の終了コードだけを信用せず、
-# 結果 XML の有無・件数で判定し、実行されなかった場合は待ってから再試行する。
+# エミュレータが不安定（容量不足・surfaceflinger の abort による framework 再起動など）だと APK の
+# インストールが失敗する。このとき AGP は警告ログだけで BUILD SUCCESSFUL を返し、テストが 1 件も走らないまま
+# CI が緑になる。そのため Gradle の終了コードだけを信用せず、結果 XML の有無・件数で判定し、
+# 実行されなかった場合は待ってから再試行する。原因調査用に ui-test-diagnostics/ へ証跡を残す。
 set -euo pipefail
 
 RESULTS_DIR="${RESULTS_DIR:-app/build/outputs/androidTest-results/connected}"
@@ -94,11 +94,6 @@ finish() {
 trap finish EXIT
 
 start_live_logcat
-
-# 【一時的な切り分け実験】RegionSampling（ナビバーのジェスチャーピル）を避けるため 3 ボタンナビへ切り替える。
-if [ "${UI_TEST_THREE_BUTTON_NAV:-}" = "1" ] && has_adb; then
-  adb shell cmd overlay enable com.android.internal.systemui.navbar.threebutton || true
-fi
 
 for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
   rm -rf "$RESULTS_DIR"

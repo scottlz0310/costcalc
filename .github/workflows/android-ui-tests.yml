@@ -2,8 +2,12 @@ name: Android UI Tests
 
 # targetSdk 引き上げによる edge-to-edge / WindowInsets の挙動変化は、コンパイルにも
 # JVM ユニットテストにも現れない。エミュレータ上の Compose UI テストが唯一の検知手段。
-# エミュレータ API は targetSdk の引き上げ先（現行 compileSdk）に合わせる。
-# targetSdk / compileSdk を上げたら api-level も追随させること。
+#
+# 本来は targetSdk の引き上げ先（現行 compileSdk = API 37）で実行したいが、Linux CI の API 37 エミュレータは
+# surfaceflinger 等が abort して使い物にならない（原因・証跡・戻す条件は #101）。
+# そのため API 36 を必須、API 37 を非必須（失敗しても CI を落とさず警告のみ）で併走させる。
+# API 37 が安定して緑になったら #101 の手順で必須化する。
+# targetSdk 引き上げ PR は、CI の API 36 だけでは検証できないため手元の API 37 エミュレータでも実行すること。
 on:
   pull_request:
     branches: [main]
@@ -13,6 +17,7 @@ on:
       - '*.gradle.kts'
       - 'gradle.properties'
       - '.github/workflows/android-ui-tests.yml'
+      - '.github/scripts/run-ui-tests.sh'
   workflow_dispatch:
 
 concurrency:
@@ -21,28 +26,19 @@ concurrency:
 
 jobs:
   android-ui:
-    name: Android UI Test (${{ matrix.variant }})
+    name: Android UI Test (API ${{ matrix.api_level }}${{ matrix.experimental && ', 非必須' || '' }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    env:
-      UI_TEST_THREE_BUTTON_NAV: ${{ matrix.three_button_nav }}
-    # 【一時的な切り分け実験】surfaceflinger の abort を避けられる GPU モード／エミュレータ版を比較する。
     strategy:
       fail-fast: false
       matrix:
         include:
-          - variant: playstore-image
-            api_level: '37.0'
-            target: google_apis_playstore
-            options: -gpu swiftshader_indirect
-            emulator_build: ''
-            three_button_nav: ''
-          - variant: gpu-off
-            api_level: '37.0'
-            target: google_apis
-            options: -gpu off
-            emulator_build: ''
-            three_button_nav: ''
+          - api_level: '36'
+            experimental: false
+          # SDK 上のパッケージ名が android-37.0 のため "37.0" を指定する（platform・system image 共通）。
+          # 引用符を外すと YAML が数値 37 に丸められ、platforms;android-37 が見つからず失敗する。
+          - api_level: '37.0'
+            experimental: true
 
     steps:
       - uses: actions/checkout@v7
@@ -68,35 +64,44 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      # エミュレータ起動と同時に Gradle のコンパイルを走らせると CPU を奪い合い、system_server が
-      # 落ちて再起動を繰り返す（package サービスが見つからずインストール不能になる）。
-      # APK のビルドを先に済ませ、エミュレータ起動後はインストールとテスト実行だけにする。
+      # エミュレータ起動後の処理をインストールとテスト実行だけにするため、APK を先にビルドしておく。
       - name: APK をビルド
         run: ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest --no-daemon
 
       - name: UI テストを実行
+        id: ui-tests
+        # 非必須ジョブ（API 37）は失敗しても job を落とさない。失敗は次のステップで警告として可視化する。
+        continue-on-error: ${{ matrix.experimental }}
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          # SDK 上のパッケージ名が android-37.0 のため "37.0" を指定する（platform・system image 共通）。
-          # 引用符を外すと YAML が数値 37 に丸め、platforms;android-37 が見つからず失敗する。
           api-level: ${{ matrix.api_level }}
           arch: x86_64
-          target: ${{ matrix.target }}
+          target: google_apis
           profile: pixel_6
-          # 未指定だと /data が約 800MB しか無く、APK インストール時に容量不足で system_server が不安定になる。
+          # 未指定だと /data が約 800MB で 100% 使用となり、APK がインストールできない（実測）。
           disk-size: 6000M
-          # 既定（2 コア・2GB）では API 37 イメージの system_server が起動後に落ちて再起動を繰り返す。
+          # ubuntu-latest（4 vCPU / 16GB）に合わせる。
           cores: 4
           ram-size: 4096M
           disable-animations: true
-          emulator-build: ${{ matrix.emulator_build }}
-          emulator-options: -no-window ${{ matrix.options }} -noaudio -no-boot-anim
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           script: bash .github/scripts/run-ui-tests.sh
+
+      - name: 非必須ジョブの失敗を警告として残す
+        if: matrix.experimental && steps.ui-tests.outcome == 'failure'
+        run: |
+          echo "::warning title=API ${{ matrix.api_level }} の UI テストが失敗::非必須ジョブのため CI は落としていません。既知の問題で、原因と戻す条件は #101 を参照してください。診断は artifact の ui-test-diagnostics にあります。"
+          {
+            echo "### :warning: API ${{ matrix.api_level }} の UI テストが失敗（非必須）"
+            echo ""
+            echo "Linux CI の API 37 エミュレータは既知の問題で不安定です。原因と戻す条件は #101 を参照。"
+            echo "このジョブが緑になったら、API 37 を必須にできるか #101 で判断してください。"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: android-ui-test-report-${{ github.run_number }}-${{ strategy.job-index }}
+          name: android-ui-test-report-api-${{ matrix.api_level }}-${{ github.run_number }}
           # ui-test-diagnostics: run-ui-tests.sh が残す証跡（連続 logcat・dropbox のクラッシュ記録・
           # 試行ごとの状態と結果）。テストが走らなかった場合の原因調査に使う。
           path: |
