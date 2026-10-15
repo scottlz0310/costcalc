@@ -192,9 +192,12 @@ v1.3.0 でボトムナビがメニュー画面（ハブ型）に変わったた�
   -Pandroid.testInstrumentationRunnerArguments.captureScreenshots=true \
   -Pandroid.injected.androidTest.leaveApksInstalledAfterRun=true
 
-adb pull /sdcard/Android/data/io.github.scottlz0310.shoptools/files/screenshots assets/screenshot/v1.3
+adb pull /sdcard/Android/data/io.github.scottlz0310.shoptools/files/screenshots/. assets/screenshot/v1.3
 pnpm gen-play-assets
 ```
+
+- **`adb pull` のコピー元は、末尾に `/.` を付ける**（ディレクトリの中身を、宛先の直下へコピーする）。付けないと、宛先が既に存在する 2 回目以降は、`assets/screenshot/v1.3/screenshots/` の中に入り、`gen-play-assets` が読まず、古い画像から入稿用の画像が作られる（初回は宛先が無いため、うまくいく）。付けると、宛先の有無・初回・再実行のどれでも、同じ場所を上書きする
+- Git Bash では、`/sdcard/...` が Windows のパスに変換されるため、`MSYS_NO_PATHCONV=1 adb pull ...` とする（PowerShell では不要）
 
 - `leaveApksInstalledAfterRun` が無いと、AGP がテスト後にアプリをアンインストールし、アプリ専用の保存先の画像が消える
 - 撮影後、テストは設定を「標準」のフォントに戻す。画面の入力値は、アプリに残る
