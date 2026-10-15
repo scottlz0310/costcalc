@@ -16,6 +16,7 @@
   - Hilt テスト用ランナー `HiltTestRunner` を追加し、`testInstrumentationRunner` を差し替え
   - `compose-ui-test-junit4` / `hilt-android-testing` / `androidx.test` 系を追加。`espresso-core` は API 37 で廃止された隠し API を呼ぶ 3.5.0 を避けるため 3.7.0 に固定
 - `android-ui-tests.yml` を追加。API 37 エミュレータで UI テストを実行（`app/**` 等の変更を含む PR と手動実行）(#77)
+  - エミュレータ起動直後は APK インストールが失敗しても AGP が成功終了し、テスト 0 件で緑になる。`.github/scripts/run-ui-tests.sh` が結果 XML の件数で判定し、未実行なら再試行する
 
 ### 修正
 - CameraX の実験的 API 利用箇所に `@OptIn` を付与し、`UnsafeOptInUsageError` 15 件を解消 (#77)
