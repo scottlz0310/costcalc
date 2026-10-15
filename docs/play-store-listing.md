@@ -160,18 +160,45 @@ ML Kit の識別子は「インストールごとの ID であり、利用者個
 |---|---|---|
 | アプリアイコン | 512×512 PNG（32bit、アルファ付き） | ✅ `assets/ShopTools_ICON_512.png` |
 | フィーチャーグラフィック | 1024×500 PNG または JPEG | ✅ `assets/feature-graphic.jpg`（1024×495）を `scripts/generate_play_assets.mjs` が 1024×500 へ変換し、`assets/play/` の出力を入稿 |
-| スマートフォンのスクリーンショット | 2〜8枚、16:9 または 9:16、各辺 320px〜3840px | ✅ `assets/screenshot/*.png` 4 枚（撮影元 1096×2560）を同スクリプトでナビゲーションバーを除き 9:16（1440×2560）へ整形して入稿 |
+| スマートフォンのスクリーンショット | 2〜8枚、16:9 または 9:16、各辺 320px〜3840px | ✅ v1.2.0: `assets/screenshot/*.png` 4 枚（撮影元 1096×2560）を同スクリプトでナビゲーションバーを除き 9:16（1440×2560）へ整形して入稿。**v1.3.0 以降は、下記の新しい UI の画像に差し替える（#112）** |
 | 7インチタブレット | 任意 | 対応しない（任意項目のため） |
 | 10インチタブレット | 任意 | 対応しない（任意項目のため） |
 
-撮影元の 1096×2560 は、Play の「長辺は短辺の 2 倍以内」を満たさない（2560/1096 = 2.34）。このため 9:16 へ整形してから入稿する。
+撮影元の 1096×2560 や 1080×2209 は、Play の「長辺は短辺の 2 倍以内」を満たさない（2560/1096 = 2.34、2209/1080 = 2.05）。このため 9:16 へ整形してから入稿する。
 
-スクリーンショットの推奨構成:
+### スクリーンショット（v1.3.0 以降）
 
-1. 単価比較 — 複数商品を入力し最安がハイライトされた状態
-2. 単価比較 — カメラ OCR で値札を読み取っている状態
-3. 切手組み合わせ — 「ぴったり」「足りない」「超える」の3カテゴリが並んだ状態
-4. 設定 — フォントサイズ「特大」を適用した状態
+v1.3.0 でボトムナビがメニュー画面（ハブ型）に変わったため、v1.2.0 のスクリーンショットは旧 UI のまま（#112）。次の 5 枚に差し替える。
+
+| 順 | 画面 | 元画像 |
+|---|---|---|
+| 1 | メニュー（バナーと機能カード） | `assets/screenshot/v1.3/1-menu.png` |
+| 2 | 単価比較 — 複数商品を入力し、最安がハイライトされた状態 | `assets/screenshot/v1.3/2-unit-price.png` |
+| 3 | 単価比較 — カメラ OCR で値札を読み取っている状態 | `assets/screenshot/Unit-Price-Comparison2.png`（v1.2.0 の実機の画像。OCR の画面は旧 UI と同じため再利用する。ステータスバーは入稿用の整形で残るため、気になる場合は実機で撮り直す） |
+| 4 | 切手組み合わせ — 「ぴったり」「足りない」「超える」の 3 カテゴリが並んだ状態 | `assets/screenshot/v1.3/3-stamps.png` |
+| 5 | 設定 — フォントサイズ「特大」を適用した状態 | `assets/screenshot/v1.3/4-settings.png` |
+
+- **`assets/screenshot/` 直下の元画像（v1.2.0 用）は、上書き・削除しない。** 公開済みの GitHub Release v1.2.0 のリリースノートが、`main` の raw URL で参照している（旧版の説明に新 UI が出てしまう）
+- 入稿用の画像は、`pnpm gen-play-assets` で `assets/play/screenshot/`（v1.2.0 用）と `assets/play/screenshot/v1.3/`（v1.3.0 用）に生成される（`assets/play/` は git 管理外）。**入稿は、Play Console での手作業**
+- 新 UI の画像は、システムバーを除いた、アプリの画面だけ（1080×2209）。実機のステータスバーが写らない
+
+#### 新 UI の画像の撮り直し方
+
+`StoreScreenshotsTest`（`app/src/androidTest`）が、画面の状態（入力値・フォントサイズ）をセットして撮影する。通常のテスト実行では、何もせずに成功する。エミュレータまたは端末を起動して、次を実行する。
+
+```bash
+./gradlew :app:connectedDebugAndroidTest \
+  -Pandroid.testInstrumentationRunnerArguments.class=io.github.scottlz0310.shoptools.StoreScreenshotsTest \
+  -Pandroid.testInstrumentationRunnerArguments.captureScreenshots=true \
+  -Pandroid.injected.androidTest.leaveApksInstalledAfterRun=true
+
+adb pull /sdcard/Android/data/io.github.scottlz0310.shoptools/files/screenshots assets/screenshot/v1.3
+pnpm gen-play-assets
+```
+
+- `leaveApksInstalledAfterRun` が無いと、AGP がテスト後にアプリをアンインストールし、アプリ専用の保存先の画像が消える
+- 撮影後、テストは設定を「標準」のフォントに戻す。画面の入力値は、アプリに残る
+- 次のバージョンで撮り直す場合は、`v1.3` を新しい版のディレクトリ名に変える（`StoreScreenshotsTest` の保存先は共通。`adb pull` の宛先を変える）
 
 ---
 

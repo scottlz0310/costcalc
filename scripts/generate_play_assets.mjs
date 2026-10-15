@@ -3,19 +3,24 @@
  *
  * 入力（`assets/`）:
  *   - feature-graphic.jpg       … 任意サイズ。1024×500 へ引き伸ばす
- *   - screenshot/*.png          … 端末で撮影したスクリーンショット
+ *   - screenshot/*.png          … 端末で撮影したスクリーンショット（v1.2.0。システムバー付き）
+ *   - screenshot/<版>/*.png     … StoreScreenshotsTest で撮影した、システムバー無しの画面だけの画像
  *
  * 出力（`assets/play/`）:
  *   - feature-graphic.jpg       … 1024×500 JPEG（Play の要求仕様）
  *   - screenshot/*.png          … 1440×2560（9:16）
+ *   - screenshot/<版>/*.png     … 同上
  *
  * スクリーンショットの変換内容:
- *   1. 下端のシステムナビゲーションバー（OS の描画領域でアプリの一部ではない）を切り落とす
- *   2. 9:16 のキャンバス中央上寄せで配置し、余白をアプリの背景色で埋める
+ *   - screenshot/*.png:
+ *       1. 下端のシステムナビゲーションバー（OS の描画領域でアプリの一部ではない）を切り落とす
+ *       2. 9:16 のキャンバス中央上寄せで配置し、余白をアプリの背景色で埋める
+ *   - screenshot/<版>/*.png: システムバーは撮影時に除いてあるため、切り落とさない。
+ *     9:16 のキャンバスに収まる最大の大きさへ拡大し、中央上寄せで配置する
  *
  * Play は「長辺が短辺の2倍を超えてはならない」と定めており、撮影元の 1096×2560
- * （2.34倍）はそのままでは受け付けられない。9:16 に整えることで、この制約と
- * 「おすすめ掲載の対象条件（9:16 かつ短辺 1080px 以上）」の双方を満たす。
+ * （2.34倍）や 1080×2209（2.05倍）はそのままでは受け付けられない。9:16 に整えることで、
+ * この制約と「おすすめ掲載の対象条件（9:16 かつ短辺 1080px 以上）」の双方を満たす。
  */
 
 import { createCanvas, loadImage } from '@napi-rs/canvas';
@@ -68,8 +73,42 @@ async function generateScreenshots() {
   }
 }
 
+/** システムバー無しの画像を、9:16 のキャンバスに収まる最大の大きさへ拡大して、中央上寄せで配置する。 */
+async function generateVersionedScreenshots() {
+  const root = path.join(ASSETS, 'screenshot');
+  const versions = (await readdir(root, { withFileTypes: true })).filter((e) => e.isDirectory());
+
+  for (const version of versions) {
+    const dir = path.join(root, version.name);
+    const outDir = path.join(OUT, 'screenshot', version.name);
+    await mkdir(outDir, { recursive: true });
+    const files = (await readdir(dir)).filter((f) => f.endsWith('.png'));
+
+    for (const file of files) {
+      const img = await loadImage(path.join(dir, file));
+      const scale = Math.min(SHOT_W / img.width, SHOT_H / img.height);
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+
+      const canvas = createCanvas(SHOT_W, SHOT_H);
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = PAD_COLOR;
+      ctx.fillRect(0, 0, SHOT_W, SHOT_H);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, Math.round((SHOT_W - w) / 2), 0, w, h);
+
+      const out = path.join(outDir, file);
+      await writeFile(out, canvas.toBuffer('image/png'));
+      console.log(`  ✓ ${out} (${img.width}×${img.height} → ${w}×${h} / ${SHOT_W}×${SHOT_H})`);
+    }
+  }
+}
+
 await mkdir(path.join(OUT, 'screenshot'), { recursive: true });
 console.log('フィーチャーグラフィック:');
 await generateFeatureGraphic();
 console.log('スクリーンショット:');
 await generateScreenshots();
+console.log('スクリーンショット（版ごと）:');
+await generateVersionedScreenshots();
