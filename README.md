@@ -140,22 +140,22 @@ adb install app\build\outputs\apk\debug\app-debug.apk
 **クローン後に一度だけ** 下記を実行すること（未実行だとフックは動作しない）。
 
 ```bash
-# 1. ktlint CLI をインストール（~/.local/bin に配置。版は .ktlint-version。jq が必要）
-bash scripts/install-ktlint.sh
-
-# 2. lefthook をインストールしてフックを登録
+# lefthook をインストールしてフックを登録
 pnpm install
 ```
 
 lefthook は `devDependencies` で管理しており、`pnpm install` の `prepare` スクリプトが
 `lefthook install` まで実行する。lefthook 自体を別途インストールする必要はない。
 
-**ktlint の版**は、リポジトリ直下の `.ktlint-version` が唯一の定義で、CI も同じスクリプトで入れる。
-pre-commit は、コミットのたびに `install-ktlint.sh` を実行して、この版が入っていることを保証する（同じ版なら何もしない）。
-ダウンロードしたバイナリは、GitHub のリリースアセットの digest（SHA-256）と照合する。
+**ktlint** は、`scripts/ktlint.sh` が、必要なら自動でインストールして実行する（`~/.local/bin` に配置。`jq` が必要）。
+pre-commit も CI も、この同じスクリプトを使う。
 
-> **Windows の場合**: Git Bash または WSL 上で `scripts/install-ktlint.sh` を実行する。
-> `jq` が必要（例: `scoop install jq`）。
+- 版は、リポジトリ直下の `.ktlint-version` が唯一の定義。同じ版が入っていれば、インストールは何もしない
+- **PATH ではなく、インストール先のバイナリを実行する**。PATH に別の版の `ktlint` があっても、CI とローカルで版が食い違わない
+- ダウンロードしたバイナリは、GitHub のリリースアセットの digest（SHA-256）と照合する
+- 手動で実行するとき: `bash scripts/ktlint.sh --format path/to/File.kt`
+
+> **Windows の場合**: Git Bash または WSL で実行する。`jq` が必要（例: `scoop install jq`）。
 
 ### UI テスト（インストルメンテーション）
 

@@ -102,14 +102,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # 版は .ktlint-version が唯一の定義。ローカル（lefthook）も同じスクリプトで入れるため、版が食い違わない。
-      - name: ktlint をインストール
+      # 版は .ktlint-version が唯一の定義。ローカル（lefthook）も同じ scripts/ktlint.sh を使うため、版が食い違わない。
+      # ktlint.sh は、必要ならインストールし、PATH ではなくインストール先のバイナリを実行する。
+      - name: ktlint チェック
         env:
           # 未認証の GitHub API はレート制限が厳しいため、トークンを渡す。
           GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          bash scripts/install-ktlint.sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-
-      - name: ktlint チェック
-        run: ktlint "**/*.kt"
+        run: bash scripts/ktlint.sh "**/*.kt"
