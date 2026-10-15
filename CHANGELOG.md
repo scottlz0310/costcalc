@@ -19,6 +19,9 @@
   - Linux CI の API 37 エミュレータは surfaceflinger 等が abort して不安定なため非必須（原因・証跡・戻す条件は #101）
   - エミュレータ不安定時に AGP がテスト 0 件のまま成功終了する問題を防ぐため、`.github/scripts/run-ui-tests.sh` が結果 XML の件数で判定し、未実行なら再試行する
   - 原因調査用に連続 logcat・dropbox・試行別の状態を `ui-test-diagnostics` として artifact に保存
+- ローカルの API 37 エミュレータで UI テストを実行する `scripts/run-ui-tests-local.ps1` を追加 (#77, #101)
+  - Linux CI で API 37 を検証できない間の、`targetSdk` 引き上げ PR の検証手段。システムイメージの取得・AVD の作成・エミュレータの起動と停止まで自動化
+  - 結果を HEAD の commit status `ui-test/api37-local` として PR に記録。AGP がテスト 0 件で成功終了する問題に備え、結果 XML の件数で判定
 
 ### 修正
 - CameraX の実験的 API 利用箇所に `@OptIn` を付与し、`UnsafeOptInUsageError` 15 件を解消 (#77)
