@@ -22,6 +22,19 @@ sum_attr() {
   echo "$total"
 }
 
+# テストが走らなかった原因（容量・AppOps・システムログ）を CI ログに残す。診断自体の失敗は無視する。
+dump_diagnostics() {
+  echo "::group::エミュレータ診断"
+  adb devices -l || true
+  adb shell getprop ro.build.fingerprint || true
+  adb shell getprop sys.boot_completed || true
+  adb shell df /data || true
+  adb shell cmd appops get android GET_USAGE_STATS || true
+  adb shell pm list packages io.github.scottlz0310 || true
+  adb logcat -d -b all -t 3000 | grep -i -E "StorageStats|AppOps|GET_USAGE_STATS|PackageInstaller|installd" | tail -n 60 || true
+  echo "::endgroup::"
+}
+
 for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
   rm -rf "$RESULTS_DIR"
   status=0
@@ -42,6 +55,7 @@ for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
   fi
 
   echo "::warning::UI テストが 1 件も実行されなかった（試行 ${attempt}）。エミュレータの初期化待ちの可能性があるため再試行する"
+  dump_diagnostics
   [ "$attempt" -lt "$MAX_ATTEMPTS" ] && sleep "$RETRY_WAIT_SEC"
 done
 
