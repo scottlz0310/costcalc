@@ -2,10 +2,7 @@ package io.github.scottlz0310.shoptools
 
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
-import androidx.compose.ui.test.hasClickAction
-import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
-import androidx.compose.ui.test.performClick
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -42,10 +39,7 @@ class SystemBarInsetsTest(
     @Test
     fun textStaysInsideSystemBars() {
         val activity = composeRule.activity
-        composeRule
-            .onNode(hasText(activity.getString(screen.tabLabel)) and hasClickAction())
-            .performClick()
-        composeRule.waitForIdle()
+        screen.open(composeRule, activity)
 
         val decorView = activity.window.decorView
         val insets =

@@ -186,10 +186,13 @@ pwsh scripts/run-ui-tests-local.ps1
 
 ```
 io.github.scottlz0310.shoptools
-├─ app/        (Application, MainActivity, NavHost)
+├─ app/        (Application, MainActivity, NavHost, メニューに並ぶ機能の一覧)
 ├─ design/     (Theme, LargeResultCard, ErrorText)
 ├─ core/       (NumberFormat, Validation)
 └─ feature/
+   ├─ menu/
+   │  ├─ ui/             (MenuScreen)
+   │  └─ ToolFeature.kt  (メニューに並ぶ機能の定義)
    ├─ unitprice/
    │  ├─ ui/             (UnitPriceScreen)
    │  │  └─ ocr/         (CameraOcrScreen, OcrViewModel, TextParser, OcrCandidate)
