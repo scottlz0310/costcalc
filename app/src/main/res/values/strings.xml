@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">お買い物計算ツール</string>
-    <string name="tab_unit_price">単価比較</string>
-    <string name="tab_stamps">切手</string>
-    <string name="tab_settings">設定</string>
+    <string name="screen_unit_price">単価比較</string>
+    <string name="screen_stamps">切手</string>
+    <string name="screen_settings">設定</string>
+    <string name="nav_back">戻る</string>
+    <string name="menu_tagline">電卓だけではわかりにくい計算を助けます</string>
+    <string name="menu_unit_price_description">価格と内容量から、一番お得な商品を見つけます</string>
+    <string name="menu_stamps_description">手持ちの切手で、目標金額に近い組み合わせを探します</string>
     <string name="empty_unit_price">商品を追加すると、最もお得なものを大きく表示します</string>
     <string name="empty_stamps">在庫（額面:枚数）を追加して、目標金額に近い組合せを探します</string>
     <string name="label_cheapest">最安</string>

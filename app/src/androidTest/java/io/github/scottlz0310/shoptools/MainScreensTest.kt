@@ -1,11 +1,8 @@
 package io.github.scottlz0310.shoptools
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.hasClickAction
-import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.github.scottlz0310.shoptools.app.MainActivity
@@ -15,7 +12,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-/** 3 画面がボトムナビから表示・遷移できること。 */
+/** メニューと各画面が表示でき、メニューから各画面へ遷移できること。 */
 @HiltAndroidTest
 @RunWith(Parameterized::class)
 class MainScreensTest(
@@ -31,11 +28,9 @@ class MainScreensTest(
     fun setUp() = hiltRule.inject()
 
     @Test
-    fun navigatesToScreenFromBottomNav() {
+    fun opensScreenFromMenu() {
         val activity = composeRule.activity
-        composeRule
-            .onNode(hasText(activity.getString(screen.tabLabel)) and hasClickAction())
-            .performClick()
+        screen.open(composeRule, activity)
 
         composeRule.onNodeWithText(activity.getString(screen.contentText)).assertIsDisplayed()
     }
