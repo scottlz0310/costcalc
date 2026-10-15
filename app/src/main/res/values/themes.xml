@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.ShopTools" parent="Theme.Material3.DayNight.NoActionBar" />
+    <style name="Theme.ShopTools" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- 画面（ShopToolsTheme）はライト配色のみで、端末のダークモードに追従しない。
+             ステータスバーは透明で背景が明るいため、アイコンは常に濃い色にする。 -->
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
 </resources>

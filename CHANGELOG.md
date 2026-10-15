@@ -49,6 +49,9 @@
   - XML と PNG の併存は `IconXmlAndPng` の警告になる（新しい画像リソースの追加を契機に lint が検出する）。`scripts/generate_icons.mjs` も PNG を生成しないよう変更
 
 ### 修正
+- ステータスバーのアイコンが白く、ライトな背景に重なって読みにくい問題を修正 (#107)
+  - 画面はライト配色のみだが、ウィンドウのテーマに `windowLightStatusBar` の指定が無く、アイコンが白（ダーク用）になっていた。実機の v1.2.0 でも起きていた
+  - テーマで常に濃いアイコンにし、端末のライト／ダークの両モードで読めることを確認。UI テスト（`StatusBarAppearanceTest`）を追加
 - Play 公開後の実態に合わせてドキュメントを更新
   - `docs/play-store-listing.md`: グラフィック素材の状態、プライバシーポリシー URL（末尾スラッシュ付き）、リリース手順を実績に置き換え
   - `README.md` / `USAGE.md`: 配布先の「現在準備中」を Google Play へのリンクに更新
