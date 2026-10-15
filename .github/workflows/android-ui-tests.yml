@@ -21,9 +21,26 @@ concurrency:
 
 jobs:
   android-ui:
-    name: Android UI Test (API 37)
+    name: Android UI Test (API 37, ${{ matrix.variant }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # 【一時的な切り分け実験】surfaceflinger の abort を避けられる GPU モード／エミュレータ版を比較する。
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: swiftshader (control)
+            gpu: swiftshader_indirect
+            emulator_build: ''
+          - variant: swangle
+            gpu: swangle_indirect
+            emulator_build: ''
+          - variant: guest
+            gpu: guest
+            emulator_build: ''
+          - variant: emulator-37.1.11
+            gpu: swiftshader_indirect
+            emulator_build: '15917651'
 
     steps:
       - uses: actions/checkout@v7
@@ -70,13 +87,14 @@ jobs:
           cores: 4
           ram-size: 4096M
           disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-build: ${{ matrix.emulator_build }}
+          emulator-options: -no-window -gpu ${{ matrix.gpu }} -noaudio -no-boot-anim
           script: bash .github/scripts/run-ui-tests.sh
 
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: android-ui-test-report-${{ github.run_number }}
+          name: android-ui-test-report-${{ github.run_number }}-${{ matrix.gpu }}-${{ matrix.emulator_build || 'latest' }}
           # ui-test-diagnostics: run-ui-tests.sh が残す証跡（連続 logcat・dropbox のクラッシュ記録・
           # 試行ごとの状態と結果）。テストが走らなかった場合の原因調査に使う。
           path: |
