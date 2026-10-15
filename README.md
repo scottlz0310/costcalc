@@ -164,6 +164,13 @@ pwsh scripts/run-ui-tests-local.ps1
 `ui-test/api37-local` として PR に記録される。push すると SHA が変わって status が外れるため、変更後は再実行する。
 `-NoPost` で status の投稿を省略できる（未コミットの変更があっても実行できる）。
 
+**新しい Android API が出たとき**: `OldTargetApi` を error にしているため、CI の Android Lint が赤くなる。これは
+`targetSdk` の引き上げを促す通知で、次の順で対応する。
+
+1. `targetSdk` を引き上げる PR を作る（Renovate の `manual-verification-required` PR を使ってもよい）
+2. 公式の「Behavior changes: Apps targeting Android N」を読み、影響する挙動変更を確認する
+3. 上記のローカル検証を実行して結果を PR に残す。UI テストで検知できない領域（カメラ・OCR 等）は実機で確認する
+
 前提: [Android SDK セットアップ](#android-sdk-セットアップandroid-studio-なしの場合)（`cmdline-tools` を含む）、`gh`（認証済み）、CPU の仮想化支援（Windows では WHPX）。
 
 ---
