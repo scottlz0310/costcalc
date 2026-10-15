@@ -21,6 +21,10 @@
   - 原因調査用に連続 logcat・dropbox・試行別の状態を `ui-test-diagnostics` として artifact に保存
 - `android-ui-tests.yml` を週次（毎週月曜 03:00 JST）でも実行し、非必須の API 37 が全件成功したら #101 に通知する (#101)
   - 上流のエミュレータ修正で API 37 が安定したことを自動で検知し、必須化の判断につなげる。通知の重複投稿を防ぐ `.github/scripts/notify-api37-green.sh` と、その分岐テストを追加し CI で実行
+- Codecov を導入し、ユニットテストのカバレッジを可視化 (#99)
+  - `debug` ビルドで `enableUnitTestCoverage` を有効化し、`ci.yml` で `createDebugUnitTestCoverageReport` を実行して `codecov/codecov-action` で送信
+  - `codecov.yml` は導入直後のため informational（閾値による CI 失敗なし）。Hilt / Dagger の生成コードは計測から除外
+  - アップロードの失敗では CI を落とさない（`fail_ci_if_error: false`）。UI テスト（androidTest）のカバレッジは対象外
 - ローカルの API 37 エミュレータで UI テストを実行する `scripts/run-ui-tests-local.ps1` を追加 (#77, #101)
   - Linux CI で API 37 を検証できない間の、`targetSdk` 引き上げ PR の検証手段。システムイメージの取得・AVD の作成・エミュレータの起動と停止まで自動化
   - 結果を HEAD の commit status `ui-test/api37-local` として PR に記録。AGP がテスト 0 件で成功終了する問題に備え、結果 XML の件数で判定

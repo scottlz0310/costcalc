@@ -1,0 +1,20 @@
+# 導入直後は数値が低く出るため、閾値による CI 失敗は設けない（#99）。実測してから決める。
+coverage:
+  status:
+    project:
+      default:
+        informational: true
+    patch:
+      default:
+        informational: true
+
+# Hilt / Dagger の生成コード。計測対象に含めると数値が歪む。
+ignore:
+  - "**/hilt_aggregated_deps/**"
+  - "**/dagger/**"
+  - "**/Dagger*"
+  - "**/Hilt_*"
+  - "**/*_Factory.*"
+  - "**/*_HiltModules*"
+  - "**/*_GeneratedInjector*"
+  - "**/*_MembersInjector*"
