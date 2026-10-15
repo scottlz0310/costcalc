@@ -25,6 +25,12 @@
   - Linux CI で API 37 を検証できない間の、`targetSdk` 引き上げ PR の検証手段。システムイメージの取得・AVD の作成・エミュレータの起動と停止まで自動化
   - 結果を HEAD の commit status `ui-test/api37-local` として PR に記録。AGP がテスト 0 件で成功終了する問題に備え、結果 XML の件数で判定
 
+### 変更
+- `targetSdk` を 36 から 37 に引き上げ (#77)
+  - Android 17 を対象とするアプリの挙動変更（`MessageQueue` のリフレクション・`static final` フィールドへの書き込み・CJKV 入力のアクセシビリティ）に対し、API 37 エミュレータ上でアプリの起動・3 画面の表示と遷移・システムバーとの非重なり（UI テスト 6 件）とユニットテスト 42 件が通ることを確認。カメラ・OCR は実機未検証
+- Android Lint の `OldTargetApi` / `ExpiredTargetSdkVersion` を error に昇格 (#77)
+  - 既定の Warning では `targetSdk` が古くなっても CI が落ちない。新しい Android API が出ると CI（Android Lint）が赤くなり、引き上げの検証を促す
+
 ### 修正
 - CameraX の実験的 API 利用箇所に `@OptIn` を付与し、`UnsafeOptInUsageError` 15 件を解消 (#77)
 - 未使用リソース（`ic_launcher_background` / `ic_launcher_foreground` / `label_total` / `label_diff`）を削除 (#77)

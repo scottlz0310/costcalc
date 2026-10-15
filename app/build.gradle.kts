@@ -31,7 +31,7 @@ android {
     defaultConfig {
         applicationId = "io.github.scottlz0310.shoptools"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 4
         versionName = "1.2.0"
 
@@ -56,6 +56,12 @@ android {
 
     buildFeatures {
         compose = true
+    }
+
+    lint {
+        // 既定は Warning で、昇格しなければ targetSdk が古くなっても CI は落ちない（#77）。
+        // 新しい Android API が出るたび CI が赤くなるのは意図どおりで、引き上げの検証を促す通知になる。
+        error += setOf("OldTargetApi", "ExpiredTargetSdkVersion")
     }
 }
 
