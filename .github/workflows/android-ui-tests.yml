@@ -53,7 +53,8 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           # SDK 上のパッケージ名が android-37.0 のため "37.0" を指定する（platform・system image 共通）。
-          api-level: 37.0
+          # 引用符を外すと YAML が数値 37 に丸め、platforms;android-37 が見つからず失敗する。
+          api-level: '37.0'
           arch: x86_64
           target: google_apis
           profile: pixel_6
