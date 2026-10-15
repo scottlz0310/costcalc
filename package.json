@@ -7,7 +7,8 @@
   "scripts": {
     "prepare": "lefthook install",
     "gen-icons": "node scripts/generate_icons.mjs",
-    "gen-play-assets": "node scripts/generate_play_assets.mjs"
+    "gen-play-assets": "node scripts/generate_play_assets.mjs",
+    "gen-menu-banner": "node scripts/generate_menu_banner.mjs"
   },
   "dependencies": {
     "@napi-rs/canvas": "^1.0.11"

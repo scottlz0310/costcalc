@@ -7,9 +7,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -62,13 +60,13 @@ private val toolFeatures =
             route = Screen.UnitPrice.route,
             titleRes = R.string.screen_unit_price,
             descriptionRes = R.string.menu_unit_price_description,
-            icon = Icons.Filled.ShoppingCart,
+            graphicRes = R.drawable.menu_unit_price,
         ),
         ToolFeature(
             route = Screen.Stamps.route,
             titleRes = R.string.screen_stamps,
             descriptionRes = R.string.menu_stamps_description,
-            icon = Icons.Filled.Email,
+            graphicRes = R.drawable.menu_stamps,
         ),
     )
 

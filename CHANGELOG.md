@@ -28,10 +28,12 @@
 - ローカルの API 37 エミュレータで UI テストを実行する `scripts/run-ui-tests-local.ps1` を追加 (#77, #101)
   - Linux CI で API 37 を検証できない間の、`targetSdk` 引き上げ PR の検証手段。システムイメージの取得・AVD の作成・エミュレータの起動と停止まで自動化
   - 結果を HEAD の commit status `ui-test/api37-local` として PR に記録。AGP がテスト 0 件で成功終了する問題に備え、結果 XML の件数で判定
-
 - メインメニュー画面（`MenuScreen`）を新設 (#81)
   - 起動時にメニューを表示し、各計算機能をカードで選んで開く。機能の定義（`ToolFeature`）を一覧にして、新しい機能を追加しやすくした
-  - 設定はメニュー右上の ⚙️ から開く。グラフィック（ヘッダー・各機能のイラスト）は次の PR で追加する
+  - 設定はメニュー右上の ⚙️ から開く
+- メニューにグラフィックを追加 (#81)
+  - ヘッダーに、ストア掲載と同じバナーを表示。`assets/feature-graphic.jpg` から `scripts/generate_menu_banner.mjs`（`pnpm gen-menu-banner`）で WebP に変換する
+  - 各機能のカードに、Vector Drawable のイラスト（単価比較: カートと値札、切手: 封筒と切手）を表示。`ToolFeature` の `icon` を `graphicRes` に置き換え、新しい機能はイラストを添えて追加する
 
 ### 変更
 - ナビゲーションをボトムナビからハブ＆スポーク型へ移行 (#81)

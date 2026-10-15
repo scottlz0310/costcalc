@@ -6,6 +6,7 @@
     <string name="screen_settings">設定</string>
     <string name="nav_back">戻る</string>
     <string name="menu_tagline">電卓だけではわかりにくい計算を助けます</string>
+    <string name="menu_banner_description">お買い物計算ツール。カメラで読んで、くらべて、ぴったり計算。買い物も、郵便も、これひとつで</string>
     <string name="menu_unit_price_description">価格と内容量から、一番お得な商品を見つけます</string>
     <string name="menu_stamps_description">手持ちの切手で、目標金額に近い組み合わせを探します</string>
     <string name="empty_unit_price">商品を追加すると、最もお得なものを大きく表示します</string>

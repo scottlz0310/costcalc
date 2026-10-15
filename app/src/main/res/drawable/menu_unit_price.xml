@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- メニューの「単価比較」カードのイラスト: ショッピングカートと値札。 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="96"
+    android:viewportHeight="96">
+    <!-- 背景の円 -->
+    <path
+        android:fillColor="#FFD6E4"
+        android:pathData="M48,48m-44,0a44,44 0,1 1,88 0a44,44 0,1 1,-88 0" />
+    <!-- カートの持ち手とフレーム -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#D63384"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M16,34 L24,34 L31,60 L66,60" />
+    <!-- かご -->
+    <path
+        android:fillColor="#D63384"
+        android:pathData="M27,40 L72,40 L66.5,58 L32,58 Z" />
+    <!-- 車輪 -->
+    <path
+        android:fillColor="#D63384"
+        android:pathData="M38,69m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" />
+    <path
+        android:fillColor="#D63384"
+        android:pathData="M62,69m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" />
+    <!-- 値札 -->
+    <path
+        android:fillColor="#19B8A6"
+        android:pathData="M56,10 L84,10 Q88,10 88,14 L88,30 Q88,34 84,34 L56,34 L47,22 Z" />
+    <!-- 値札のひもを通す穴 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M56,22m-2.6,0a2.6,2.6 0,1 1,5.2 0a2.6,2.6 0,1 1,-5.2 0" />
+    <!-- 値札の ¥ -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M65,15 L71,23 L77,15 M71,23 L71,31 M66,25 L76,25 M66,28.5 L76,28.5" />
+</vector>
