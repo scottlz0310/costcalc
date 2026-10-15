@@ -56,8 +56,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: 通知スクリプトのテストを実行
-        run: bash .github/scripts/test/notify-api37-green.test.sh
+      - name: シェルスクリプトのテストを実行
+        run: |
+          for t in .github/scripts/test/*.test.sh; do
+            echo "== $t"
+            bash "$t"
+          done
 
   android-lint:
     name: Android Lint
@@ -98,14 +102,14 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # 版は .ktlint-version が唯一の定義。ローカル（lefthook）も同じスクリプトで入れるため、版が食い違わない。
       - name: ktlint をインストール
         env:
-          # renovate: datasource=github-releases depName=pinterest/ktlint
-          KTLINT_VERSION: "1.8.0"
+          # 未認証の GitHub API はレート制限が厳しいため、トークンを渡す。
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          curl -sSLO "https://github.com/pinterest/ktlint/releases/download/${KTLINT_VERSION}/ktlint"
-          chmod a+x ktlint
-          sudo mv ktlint /usr/local/bin/
+          bash scripts/install-ktlint.sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: ktlint チェック
         run: ktlint "**/*.kt"

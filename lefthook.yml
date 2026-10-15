@@ -8,7 +8,9 @@ pre-commit:
       # --format は auto-correct 適用後に修正できない違反が残っても exit 0 を返す
       # (.editorconfig で function-naming / no-wildcard-imports を抑制済みのため)。
       # 修正されたファイルは stage_fixed: true で自動的に再ステージングされる。
-      run: ktlint --format {staged_files}
+      # 先に install-ktlint.sh で、.ktlint-version の版が入っていることを保証する（同じ版なら何もしない）。
+      # CI と同じ版で検査するため、ローカルで通って CI で落ちる、という食い違いが起きない。
+      run: bash scripts/install-ktlint.sh && ktlint --format {staged_files}
       stage_fixed: true
 
 pre-push:

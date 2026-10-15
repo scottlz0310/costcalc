@@ -140,7 +140,7 @@ adb install app\build\outputs\apk\debug\app-debug.apk
 **クローン後に一度だけ** 下記を実行すること（未実行だとフックは動作しない）。
 
 ```bash
-# 1. ktlint CLI をインストール（~/.local/bin に配置）
+# 1. ktlint CLI をインストール（~/.local/bin に配置。版は .ktlint-version。jq が必要）
 bash scripts/install-ktlint.sh
 
 # 2. lefthook をインストールしてフックを登録
@@ -150,9 +150,12 @@ pnpm install
 lefthook は `devDependencies` で管理しており、`pnpm install` の `prepare` スクリプトが
 `lefthook install` まで実行する。lefthook 自体を別途インストールする必要はない。
 
-> **Windows の場合**: Git Bash または WSL 上で `scripts/install-ktlint.sh` を実行するか、
-> [ktlint GitHub Releases](https://github.com/pinterest/ktlint/releases/tag/1.5.0) から
-> `ktlint` バイナリを手動ダウンロードして PATH の通ったディレクトリに配置する。
+**ktlint の版**は、リポジトリ直下の `.ktlint-version` が唯一の定義で、CI も同じスクリプトで入れる。
+pre-commit は、コミットのたびに `install-ktlint.sh` を実行して、この版が入っていることを保証する（同じ版なら何もしない）。
+ダウンロードしたバイナリは、GitHub のリリースアセットの digest（SHA-256）と照合する。
+
+> **Windows の場合**: Git Bash または WSL 上で `scripts/install-ktlint.sh` を実行する。
+> `jq` が必要（例: `scoop install jq`）。
 
 ### UI テスト（インストルメンテーション）
 
