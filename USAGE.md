@@ -2,7 +2,7 @@
 
 ## インストール
 
-公式の配布先は **Google Play のみ**です（現在準備中）。
+公式の配布先は **[Google Play](https://play.google.com/store/apps/details?id=io.github.scottlz0310.shoptools) のみ**です。
 
 > **GitHub Releases での APK 配布は終了しました。** 以前 `app-release.apk` をインストールしていた場合、
 > Play 版はパッケージ名が変わっているため上書き更新できません。**旧バージョンをアンインストールしてから**

@@ -32,6 +32,10 @@
   - 既定の Warning では `targetSdk` が古くなっても CI が落ちない。新しい Android API が出ると CI（Android Lint）が赤くなり、引き上げの検証を促す
 
 ### 修正
+- Play 公開後の実態に合わせてドキュメントを更新
+  - `docs/play-store-listing.md`: グラフィック素材の状態、プライバシーポリシー URL（末尾スラッシュ付き）、リリース手順を実績に置き換え
+  - `README.md` / `USAGE.md`: 配布先の「現在準備中」を Google Play へのリンクに更新
+  - `CHANGELOG.md`: 次のリリース用の雛形コメントを `[1.3.0]` に更新
 - CameraX の実験的 API 利用箇所に `@OptIn` を付与し、`UnsafeOptInUsageError` 15 件を解消 (#77)
 - 未使用リソース（`ic_launcher_background` / `ic_launcher_foreground` / `label_total` / `label_diff`）を削除 (#77)
 - `mipmap-anydpi-v26` を `mipmap-anydpi` へ改名（`minSdk = 26` のため修飾が不要）。`generate_icons.mjs` の出力先と monochrome 参照も追随 (#77)
@@ -143,4 +147,4 @@
 ---
 
 <!-- 次のリリースはここに追加 -->
-<!-- ## [1.2.0] - YYYY-MM-DD -->
+<!-- ## [1.3.0] - YYYY-MM-DD -->
