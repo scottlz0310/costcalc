@@ -1,0 +1,4 @@
+// シンボル抽出は NDK 不在でも成功扱いになるため、ビルド前に AGP の既定版を解決する。
+gradle.projectsEvaluated {
+    rootProject.project(':app').androidComponents.sdkComponents.ndkDirectory.get()
+}
