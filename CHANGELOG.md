@@ -7,6 +7,9 @@
 
 ## [Unreleased]
 
+### 修正
+- Android UI テスト CI の Command-line Tools を 22.0 に更新し、API 37.0 の AVD が `android-0` と誤認される問題を防止。テスト前に AVD target を確認し、設定を診断 artifact に保存 (#101)
+
 ---
 
 ## [1.3.1] - 2026-10-16

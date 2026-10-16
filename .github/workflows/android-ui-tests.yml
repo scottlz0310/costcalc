@@ -4,7 +4,8 @@ name: Android UI Tests
 # JVM ユニットテストにも現れない。エミュレータ上の Compose UI テストが唯一の検知手段。
 #
 # 本来は targetSdk の引き上げ先（現行 compileSdk = API 37）で実行したいが、Linux CI の API 37 エミュレータは
-# surfaceflinger 等が abort して使い物にならない（原因・証跡・戻す条件は #101）。
+# 旧 avdmanager による API 誤認で surfaceflinger 等が abort していた（#101）。
+# Command-line Tools 22.0 と AVD target の確認を入れ、CI 上での安定性を検証する。
 # そのため API 36 を必須、API 37 を非必須（失敗しても CI を落とさず警告のみ）で併走させる。
 # API 37 が安定して緑になったら #101 の手順で必須化する。
 # targetSdk 引き上げ PR は、CI の API 36 だけでは検証できないため scripts/run-ui-tests-local.ps1 で
@@ -23,6 +24,7 @@ on:
       - 'gradle.properties'
       - '.github/workflows/android-ui-tests.yml'
       - '.github/scripts/run-ui-tests.sh'
+      - '.github/scripts/check-avd-target.sh'
   schedule:
     # 毎週月曜 03:00（JST）
     - cron: '0 18 * * 0'
@@ -76,6 +78,19 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      # runner 付属の旧 avdmanager は android-37.0 を android-0 と誤認する。
+      # emulator-runner は latest/bin を PATH の先頭に戻すため、latest 自体を更新する。
+      - name: Android Command-line Tools 22.0 を使用
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$ANDROID_HOME" --install 'cmdline-tools;22.0' < <(yes)
+          tools="$ANDROID_HOME/cmdline-tools"
+          test -x "$tools/22.0/bin/avdmanager"
+          mv "$tools/latest" "$RUNNER_TEMP/android-command-line-tools-original"
+          ln -s 22.0 "$tools/latest"
+          mkdir -p ui-test-diagnostics
+          cat "$tools/latest/source.properties" | tee ui-test-diagnostics/command-line-tools.txt
+          "$tools/latest/bin/sdkmanager" --version
+
       # エミュレータ起動後の処理をインストールとテスト実行だけにするため、APK を先にビルドしておく。
       - name: APK をビルド
         run: ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest --no-daemon
@@ -97,7 +112,9 @@ jobs:
           ram-size: 4096M
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
-          script: bash .github/scripts/run-ui-tests.sh
+          script: |
+            bash .github/scripts/check-avd-target.sh 'android-${{ matrix.api_level }}' "$ANDROID_AVD_HOME/test.ini"
+            bash .github/scripts/run-ui-tests.sh
 
       - name: 非必須ジョブの失敗を警告として残す
         if: matrix.experimental && steps.ui-tests.outcome == 'failure'
