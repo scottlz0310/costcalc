@@ -45,6 +45,19 @@ class StatusBarAppearanceTest(
         assertTrue("ステータスバーのアイコンが白い（ライト背景で読めない）", isLight)
     }
 
+    @Test
+    fun navigationBarIconsAreDark() {
+        screen.open(composeRule, composeRule.activity)
+
+        var isLight = false
+        composeRule.runOnUiThread {
+            val window = composeRule.activity.window
+            isLight = WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightNavigationBars
+        }
+
+        assertTrue("ナビゲーションバーのアイコンが白い（ライト背景で読めない）", isLight)
+    }
+
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")

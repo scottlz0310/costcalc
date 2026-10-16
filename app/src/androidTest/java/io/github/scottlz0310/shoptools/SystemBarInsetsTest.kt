@@ -42,6 +42,13 @@ class SystemBarInsetsTest(
         screen.open(composeRule, activity)
 
         val decorView = activity.window.decorView
+        val contentView = activity.findViewById<android.view.View>(android.R.id.content)
+        val contentLocation = IntArray(2)
+        composeRule.runOnUiThread { contentView.getLocationInWindow(contentLocation) }
+        assertTrue(
+            "コンテンツがウィンドウ全体に広がっていない: top=${contentLocation[1]} height=${contentView.height} window=${decorView.height}",
+            contentLocation[1] == 0 && contentView.height == decorView.height,
+        )
         val insets =
             checkNotNull(ViewCompat.getRootWindowInsets(decorView)) {
                 "ウィンドウが未アタッチで WindowInsets を取得できない"
