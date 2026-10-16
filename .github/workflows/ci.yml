@@ -129,7 +129,9 @@ jobs:
           }
           EOF
           chmod +x ./gradlew
-          ./gradlew -I scripts/prepare-release-ndk.gradle -I "$RUNNER_TEMP/unsigned-release.gradle" :app:bundleRelease --no-daemon
+          ndk_version="$(./gradlew -q :app:printNdkVersion --no-daemon)"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;$ndk_version"
+          ./gradlew -I "$RUNNER_TEMP/unsigned-release.gradle" :app:bundleRelease --no-daemon
 
       - name: 最適化メタデータと難読化マッピングを検証
         run: |

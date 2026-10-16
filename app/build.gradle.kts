@@ -71,6 +71,10 @@ android {
     }
 }
 
+tasks.register("printNdkVersion") {
+    doLast { println(android.ndkVersion) }
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)

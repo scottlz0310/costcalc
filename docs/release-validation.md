@@ -22,7 +22,9 @@ allprojects {
     }
 }
 '@ | Set-Content -LiteralPath $releaseInit -Encoding utf8
-./gradlew.bat -I scripts/prepare-release-ndk.gradle -I $releaseInit :app:assembleRelease :app:bundleRelease
+$ndkVersion = ./gradlew.bat -q :app:printNdkVersion --no-daemon
+& "$env:ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager.bat" "ndk;$ndkVersion"
+./gradlew.bat -I $releaseInit :app:assembleRelease :app:bundleRelease
 ```
 
 この APK/AAB はローカル検証専用で、Play Console には入稿しない。
@@ -83,10 +85,11 @@ ABI は `arm64-v8a` / `armeabi-v7a` / `x86` / `x86_64` の4種類。
 
 抽出には NDK が必要。NDK がない環境ではビルドが成功してもシンボルが生成されず、
 削除済みというログが出る場合があるため、ログだけで判定しない。
-CI と Release ワークフローは `scripts/prepare-release-ndk.gradle` を init script として適用し、
-AGP の公開 API `sdkComponents.ndkDirectory` をビルド前に解決する。
-未導入なら SDK ライセンスの同意を前提に AGP がインストールし、失敗時はビルドを停止する。
-NDK の版は AGP の既定に従い、別途固定しない。
+CI と Release ワークフローは `:app:printNdkVersion` でビルド設定の `android.ndkVersion` を取得し、
+ビルド前に `sdkmanager` で該当パッケージを導入する。NDK の版は AGP の既定に従い、別途固定しない。
+SDK ライセンスの同意が必要で、取得に失敗した場合はビルドを停止する。
+`sdkComponents.ndkDirectory` の参照だけでは未導入パッケージは自動取得されないため、
+明示的な `sdkmanager` 実行が必要。
 この PC で初回の調査時に導入した版は AGP 9.4.1 既定の以下の版。
 
 ```powershell
