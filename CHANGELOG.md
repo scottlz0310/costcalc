@@ -8,6 +8,7 @@
 ## [Unreleased]
 
 ### 修正
+- Release ビルドの R8 によるコード最適化・難読化とリソース圧縮を有効化し、Compose・DataStore・Hilt の過剰な keep 指定を整理 (#119)
 - Android 14 以下でも `enableEdgeToEdge()` でシステムバーの背後まで描画し、端末のライト／ダークモードに関わらず両システムバーのアイコンを濃色に統一 (#120)
 
 ---

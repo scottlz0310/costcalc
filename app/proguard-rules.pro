@@ -1,18 +1,8 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Android の既定ルールと依存ライブラリ同梱の consumer ルールを使う。
+# パッケージ全体の keep は最適化・難読化を妨げるため、アプリ固有の反射利用が必要な場合のみ追加する。
 
-# Keep Hilt generated code
--keep class dagger.hilt.** { *; }
--keep @dagger.hilt.android.HiltAndroidApp class * { *; }
--keep @dagger.hilt.android.AndroidEntryPoint class * { *; }
--keep @dagger.hilt.android.lifecycle.HiltViewModel class * { *; }
-
-# Keep DataStore
--keep class androidx.datastore.** { *; }
-
-# Keep Compose
--keep class androidx.compose.** { *; }
+# ML Kit は manifest の ComponentRegistrar を反射で生成する。
+# firebase-components 16.1.0 の consumer ルールはクラスのみを保持し、R8 full mode ではコンストラクタが削除される。
+-keepclassmembers class com.google.mlkit.** implements com.google.firebase.components.ComponentRegistrar {
+    public <init>();
+}
