@@ -7,6 +7,10 @@
 
 ## [Unreleased]
 
+---
+
+## [1.3.0] - 2026-10-16
+
 ### 追加
 - CI に Android Lint (`:app:lintDebug`) ジョブを追加 (#77)
 - `renovate.json` に `options/android-sdk` プリセットを追加し、`compileSdk` / `targetSdk` の更新 PR を提案させる (#77)
@@ -40,6 +44,7 @@
   - 撮り直し方と、入稿する 5 枚の構成は、`docs/play-store-listing.md` に記載。Play Console への入稿は手作業
 
 ### 変更
+- `versionCode` を 5 へ、`versionName` を `1.3.0` へ更新
 - ナビゲーションをボトムナビからハブ＆スポーク型へ移行 (#81)
   - ボトムナビを廃止し、各画面に戻るボタン付きの TopAppBar を追加。起動時の表示が単価比較からメニューに変わる
   - 単価比較の入力は保存されないため、ViewModel を Activity にスコープし、メニューへ戻っても残る挙動を維持
@@ -176,4 +181,4 @@
 ---
 
 <!-- 次のリリースはここに追加 -->
-<!-- ## [1.3.0] - YYYY-MM-DD -->
+<!-- ## [1.4.0] - YYYY-MM-DD -->
