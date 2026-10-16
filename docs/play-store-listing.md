@@ -166,6 +166,12 @@ ML Kit の識別子は「インストールごとの ID であり、利用者個
 
 撮影元の 1096×2560 や 1080×2209 は、Play の「長辺は短辺の 2 倍以内」を満たさない（2560/1096 = 2.34、2209/1080 = 2.05）。このため 9:16 へ整形してから入稿する。
 
+### アプリ内メニュー画面のグラフィック（来歴）
+
+- **ヘッダーバナー**: `assets/menu-banner.jpg`（1024×495）を `scripts/generate_menu_banner.mjs`（`pnpm gen-menu-banner`）で `app/src/main/res/drawable-nodpi/menu_banner.webp` に変換する。Play ストア用の `assets/feature-graphic.jpg` とは別ファイルで管理する
+- **機能カードのイラスト**: `app/src/main/res/drawable-nodpi/menu_unit_price.webp`・`menu_stamps.webp`（512×512、透過背景 WebP）
+- **生成元・利用条件**: Google Gemini 画像生成（Antigravity `image-generator`）で原画を生成し、`@napi-rs/canvas` で円形透過マスク・WebP 変換を実施。Google 生成 AI 利用規約に基づき商用利用可・クレジット表記不要
+
 ### スクリーンショット（v1.3.0 以降）
 
 v1.3.0 でボトムナビがメニュー画面（ハブ型）に変わったため、v1.2.0 のスクリーンショットは旧 UI のまま（#112）。次の 5 枚に差し替える。

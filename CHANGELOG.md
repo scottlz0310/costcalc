@@ -32,8 +32,8 @@
   - 起動時にメニューを表示し、各計算機能をカードで選んで開く。機能の定義（`ToolFeature`）を一覧にして、新しい機能を追加しやすくした
   - 設定はメニュー右上の ⚙️ から開く
 - メニューにグラフィックを追加 (#81)
-  - ヘッダーに、ストア掲載と同じバナーを表示。`assets/feature-graphic.jpg` から `scripts/generate_menu_banner.mjs`（`pnpm gen-menu-banner`）で WebP に変換する
-  - 各機能のカードに、Vector Drawable のイラスト（単価比較: カートと値札、切手: 封筒と切手）を表示。`ToolFeature` の `icon` を `graphicRes` に置き換え、新しい機能はイラストを添えて追加する
+  - ヘッダーに、メニュー専用のバナーを表示。`assets/menu-banner.jpg`（Play ストア用の `assets/feature-graphic.jpg` とは別原画）から `scripts/generate_menu_banner.mjs`（`pnpm gen-menu-banner`）で `drawable-nodpi/menu_banner.webp` に変換する
+  - 各機能のカードに、透過 WebP の円形バッジイラスト（`drawable-nodpi/menu_unit_price.webp`・`menu_stamps.webp`）を表示。`ToolFeature` の `icon` を `graphicRes` に置き換え、新しい機能はイラストを添えて追加する
 - ストア掲載用に、新しい UI（メニュー・単価比較・切手・設定）のスクリーンショットを追加 (#112)
   - `StoreScreenshotsTest`（`androidTest`）が、画面の状態をセットして撮影する。通常のテスト実行では何もせずに成功し、`captureScreenshots=true` を渡したときだけ撮影する。システムバーを除いた、アプリの画面だけを保存する
   - `assets/screenshot/v1.3/` に追加。`scripts/generate_play_assets.mjs` が、版ごとのディレクトリを 9:16（1440×2560）へ整形する。v1.2.0 用の元画像は、公開済みのリリースノートが参照しているため、変更しない
