@@ -110,7 +110,10 @@ jobs:
       # Play へアップロードする成果物は AAB。この署名鍵はアップロード鍵として扱われ、
       # 利用者に届く APK は Play アプリ署名により Google の鍵で署名される。
       - name: Play 用 AAB をビルド
-        run: ./gradlew bundleRelease --no-daemon
+        run: |
+          ndk_version="$(./gradlew -q :app:printNdkVersion --no-daemon)"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;$ndk_version"
+          ./gradlew bundleRelease --no-daemon
 
       # Play Console への手動アップロード用。GitHub Release には添付しない。
       - uses: actions/upload-artifact@v7

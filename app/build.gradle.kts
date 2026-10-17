@@ -46,6 +46,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            ndk.debugSymbolLevel = "SYMBOL_TABLE"
             signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -68,6 +69,10 @@ android {
         // 新しい Android API が出るたび CI が赤くなるのは意図どおりで、引き上げの検証を促す通知になる。
         error += setOf("OldTargetApi", "ExpiredTargetSdkVersion")
     }
+}
+
+tasks.register("printNdkVersion") {
+    doLast { println(android.ndkVersion) }
 }
 
 dependencies {

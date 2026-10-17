@@ -22,6 +22,8 @@ allprojects {
     }
 }
 '@ | Set-Content -LiteralPath $releaseInit -Encoding utf8
+$ndkVersion = ./gradlew.bat -q :app:printNdkVersion --no-daemon
+& "$env:ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager.bat" "ndk;$ndkVersion"
 ./gradlew.bat -I $releaseInit :app:assembleRelease :app:bundleRelease
 ```
 
@@ -62,6 +64,60 @@ Configuration Analyzer の最適化前の評価と、Play が参照する `r8.js
 
 参考: [R8 の有効化](https://developer.android.com/topic/performance/app-optimization/enable-app-optimization)、
 [Android vitals の DEX 最適化指標](https://developer.android.com/google/play/vitals/code-optimization)
+
+## ネイティブデバッグシンボル（#124）
+
+Release の `ndk.debugSymbolLevel = "SYMBOL_TABLE"` で、抽出可能な関数名を
+`BUNDLE-METADATA/com.android.tools.build.debugsymbols/` に同梱する。
+自前の C/C++ コードはなく、依存 AAR の prebuilt ライブラリが対象となる。
+
+| ライブラリ | 依存元 | 配布時のシンボル表 |
+|---|---|---|
+| `libdatastore_shared_counter.so` | DataStore 1.2.1 | 4 ABI とも `.symtab` あり |
+| `libandroidx.graphics.path.so` | graphics-path 1.0.1 | 削除済み |
+| `libimage_processing_util_jni.so` / `libsurface_util_jni.so` | CameraX 1.6.2 | 削除済み |
+| `libmlkit_google_ocr_pipeline.so` | text-recognition-bundled-common 17.0.0 | 削除済み |
+
+ABI は `arm64-v8a` / `armeabi-v7a` / `x86` / `x86_64` の4種類。
+動的リンク用の `.dynsym` はデバッグ用の `.symtab` と区別する。
+削除済みのシンボルや行番号は `FULL` に変更しても復元できないため、
+関数名の取得に必要な `SYMBOL_TABLE` を選択する。
+
+抽出には NDK が必要。NDK がない環境ではビルドが成功してもシンボルが生成されず、
+削除済みというログが出る場合があるため、ログだけで判定しない。
+CI と Release ワークフローは `:app:printNdkVersion` でビルド設定の `android.ndkVersion` を取得し、
+ビルド前に `sdkmanager` で該当パッケージを導入する。NDK の版は AGP の既定に従い、別途固定しない。
+SDK ライセンスの同意が必要で、取得に失敗した場合はビルドを停止する。
+`sdkComponents.ndkDirectory` の参照だけでは未導入パッケージは自動取得されないため、
+明示的な `sdkmanager` 実行が必要。
+この PC で初回の調査時に導入した版は AGP 9.4.1 既定の以下の版。
+
+```powershell
+& "$env:ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager.bat" 'ndk;28.2.13676358'
+```
+
+PR の CI は DataStore の4 ABI分について、AAB 内の `.so.sym` が空でないこと、
+`.symtab` を持つこと、AGP の抽出ファイルと一致することを検証する。
+他の16本は依存元ですでにシンボル削除済みのため、同梱を要求しない。
+シンボルは AAB 内に保持し、別の公開アセットやダミーのシンボルファイルは作成しない。
+
+Play Console の警告が完全に消えるかは次回入稿時に確認する。
+残る場合は、上記のシンボル削除済み prebuilt があることを根拠として記録する。
+R8 の mapping は Java/Kotlin 用で、このネイティブシンボル表とは別に保持する。
+
+2026-10-17、同じコード・NDK・未署名 Release で設定の有無を比較した。
+
+| 対象 | シンボルなし | `SYMBOL_TABLE` |
+|---|---:|---:|
+| AAB | 26,221,610 bytes | 26,235,914 bytes |
+| ネイティブシンボル | なし | 4ファイル・非圧縮35,408 bytes（ZIP内13,102 bytes） |
+
+AAB 全体の増加は14,304 bytes。追加された4ファイル以外の ZIP エントリはすべて同一で、
+DEX・ネイティブ本体・R8 メタデータ・mapping も変わらない。
+4ファイルの `.symtab` と AGP 出力との一致、ユニットテスト42件、Android Lint、actionlint を確認した。
+この比較はローカルの未署名 AAB で、Play への入稿確認ではない。
+
+参考: [ネイティブシンボルの同梱と prebuilt の制約](https://developer.android.com/build/include-native-symbols)
 
 ## #119 の検証記録（2026-10-16）
 

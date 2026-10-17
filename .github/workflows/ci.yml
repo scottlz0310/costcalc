@@ -129,6 +129,8 @@ jobs:
           }
           EOF
           chmod +x ./gradlew
+          ndk_version="$(./gradlew -q :app:printNdkVersion --no-daemon)"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;$ndk_version"
           ./gradlew -I "$RUNNER_TEMP/unsigned-release.gradle" :app:bundleRelease --no-daemon
 
       - name: 最適化メタデータと難読化マッピングを検証
@@ -147,6 +149,18 @@ jobs:
           unzip -p "$aab" BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map > "$RUNNER_TEMP/proguard.map"
           test -s "$RUNNER_TEMP/proguard.map"
           cmp app/build/outputs/mapping/release/mapping.txt "$RUNNER_TEMP/proguard.map"
+
+      # 他の prebuilt はシンボル削除済み。抽出可能な DataStore の全 ABI を検証する。
+      - name: ネイティブシンボル表の同梱を検証
+        run: |
+          aab=app/build/outputs/bundle/release/app-release.aab
+          for abi in arm64-v8a armeabi-v7a x86 x86_64; do
+            symbols="$RUNNER_TEMP/libdatastore_shared_counter-$abi.so.sym"
+            unzip -p "$aab" "BUNDLE-METADATA/com.android.tools.build.debugsymbols/$abi/libdatastore_shared_counter.so.sym" > "$symbols"
+            test -s "$symbols"
+            readelf --section-headers "$symbols" | grep -F '.symtab'
+            cmp "app/build/intermediates/native_symbol_tables/release/extractReleaseNativeSymbolTables/out/$abi/libdatastore_shared_counter.so.sym" "$symbols"
+          done
 
   ktlint:
     name: ktlint

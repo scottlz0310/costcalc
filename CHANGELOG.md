@@ -8,6 +8,7 @@
 ## [Unreleased]
 
 ### 修正
+- Release AAB に抽出可能なネイティブシンボル表（DataStore の4 ABI分）を同梱し、CI で検証。シンボル削除済みの依存ライブラリの制約を文書化 (#124)
 - Android UI テスト CI の Command-line Tools を 22.0 に更新し、API 37.0 の AVD が `android-0` と誤認される問題を防止。テスト前に AVD target を確認し、設定を診断 artifact に保存 (#101)
 
 ---
