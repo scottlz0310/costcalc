@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "アイコン生成などの開発補助スクリプトと Git フック",
   "type": "module",
-  "packageManager": "pnpm@12.11.2",
+  "packageManager": "pnpm@12.14.0",
   "scripts": {
     "prepare": "lefthook install",
     "gen-icons": "node scripts/generate_icons.mjs",
