@@ -162,26 +162,14 @@ pre-commit も CI も、この同じスクリプトを使う。
 `app/src/androidTest` の Compose UI テストは、エミュレータ上で実行する。`targetSdk` 引き上げによる
 edge-to-edge / WindowInsets の挙動変化は、コンパイルにも JVM ユニットテストにも現れないため、これが唯一の検知手段になる。
 
-- **CI**（`android-ui-tests.yml`）: API 36 のエミュレータで実行する（必須）。API 37 は Linux CI のエミュレータが不安定なため非必須（#101）。週次でも実行し、API 37 が全件成功したら #101 に通知する（必須化を判断する契機）
-- **ローカル**: `targetSdk` を変更する PR は、API 37 のエミュレータで実行して結果を PR に残す（下記）
-
-```powershell
-# 変更をコミット・push した後に実行する（PowerShell 7 以降）
-pwsh scripts/run-ui-tests-local.ps1
-```
-
-システムイメージの取得・AVD の作成・エミュレータの起動と停止まで自動で行う。結果は HEAD の commit status
-`ui-test/api37-local` として PR に記録される。push すると SHA が変わって status が外れるため、変更後は再実行する。
-`-NoPost` で status の投稿を省略できる（未コミットの変更があっても実行できる）。
+- **CI**（`android-ui-tests.yml`）: API 36 および API 37.0 のエミュレータで実行する（両方とも必須）。週次でも実行し、runner 標準の Command-line Tools 更新（#127）を監視する
 
 **新しい Android API が出たとき**: `OldTargetApi` を error にしているため、CI の Android Lint が赤くなる。これは
 `targetSdk` の引き上げを促す通知で、次の順で対応する。
 
 1. `targetSdk` を引き上げる PR を作る（Renovate の `manual-verification-required` PR を使ってもよい）
 2. 公式の「Behavior changes: Apps targeting Android N」を読み、影響する挙動変更を確認する
-3. 上記のローカル検証を実行して結果を PR に残す。UI テストで検知できない領域（カメラ・OCR 等）は実機で確認する
-
-前提: [Android SDK セットアップ](#android-sdk-セットアップandroid-studio-なしの場合)（`cmdline-tools` を含む）、`gh`（認証済み）、CPU の仮想化支援（Windows では WHPX）。
+3. PR を作成し、CI で API 36 / 37.0 の UI テストが全件成功することを確認する。UI テストで検知できない領域（カメラ・OCR 等）は実機で確認する
 
 ---
 

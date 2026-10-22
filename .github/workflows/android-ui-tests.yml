@@ -3,17 +3,12 @@ name: Android UI Tests
 # targetSdk 引き上げによる edge-to-edge / WindowInsets の挙動変化は、コンパイルにも
 # JVM ユニットテストにも現れない。エミュレータ上の Compose UI テストが唯一の検知手段。
 #
-# 本来は targetSdk の引き上げ先（現行 compileSdk = API 37）で実行したいが、Linux CI の API 37 エミュレータは
-# 旧 avdmanager による API 誤認で surfaceflinger 等が abort していた（#101）。
-# Command-line Tools 22.0 と AVD target の確認を入れ、CI 上での安定性を検証する。
-# そのため API 36 を必須、API 37 を非必須（失敗しても CI を落とさず警告のみ）で併走させる。
-# API 37 が安定して緑になったら #101 の手順で必須化する。
-# targetSdk 引き上げ PR は、CI の API 36 だけでは検証できないため scripts/run-ui-tests-local.ps1 で
-# 手元の API 37 エミュレータでも実行し、結果を commit status として PR に残すこと（README 参照）。
+# API 36 および compileSdk 先の API 37.0 の両方を必須として実行する。
+# runner 付属の旧 avdmanager による API 誤認（#101）は、Command-line Tools 22.0 の導入と
+# AVD target 検査で解消済み。
 #
-# 週次（schedule）でも実行する。エミュレータとシステムイメージは実行時点の最新を使うため、上流の修正で
-# API 37 が緑になったら #101 に通知する（必須化を判断する契機）。API 36 が週次で落ちた場合は、
-# 依存更新などで main が壊れた合図になる。
+# runner-images 側で標準の Command-line Tools が 22.0 以上に更新されるまでの間、
+# 週次（schedule）実行で上流の更新を自己検知し、更新が確認された段階で一時ワークアラウンドを撤去する（#127）。
 on:
   pull_request:
     branches: [main]
@@ -25,6 +20,7 @@ on:
       - '.github/workflows/android-ui-tests.yml'
       - '.github/scripts/run-ui-tests.sh'
       - '.github/scripts/check-avd-target.sh'
+      - '.github/scripts/check-runner-cmdline-tools.sh'
   schedule:
     # 毎週月曜 03:00（JST）
     - cron: '0 18 * * 0'
@@ -36,23 +32,21 @@ concurrency:
 
 jobs:
   android-ui:
-    name: Android UI Test (API ${{ matrix.api_level }}${{ matrix.experimental && ', 非必須' || '' }})
+    name: Android UI Test (API ${{ matrix.api_level }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       contents: read
-      # 週次実行で API 37 が緑になったとき、#101 にコメントするために必要（PR 実行では使わない）。
+      # 週次実行で runner の Command-line Tools 更新を検知したとき、#127 にコメントするために必要。
       issues: write
     strategy:
       fail-fast: false
       matrix:
         include:
           - api_level: '36'
-            experimental: false
           # SDK 上のパッケージ名が android-37.0 のため "37.0" を指定する（platform・system image 共通）。
           # 引用符を外すと YAML が数値 37 に丸められ、platforms;android-37 が見つからず失敗する。
           - api_level: '37.0'
-            experimental: true
 
     steps:
       - uses: actions/checkout@v7
@@ -91,14 +85,22 @@ jobs:
           cat "$tools/latest/source.properties" | tee ui-test-diagnostics/command-line-tools.txt
           "$tools/latest/bin/sdkmanager" --version
 
+      - name: ランナー標準の Command-line Tools 更新を検査
+        # 1 つのマトリクス実行（API 37.0）だけで検査・通知を行えば十分
+        if: matrix.api_level == '37.0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ISSUE: '127'
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: bash .github/scripts/check-runner-cmdline-tools.sh "$RUNNER_TEMP/android-command-line-tools-original/source.properties"
+
       # エミュレータ起動後の処理をインストールとテスト実行だけにするため、APK を先にビルドしておく。
       - name: APK をビルド
         run: ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest --no-daemon
 
       - name: UI テストを実行
         id: ui-tests
-        # 非必須ジョブ（API 37）は失敗しても job を落とさない。失敗は次のステップで警告として可視化する。
-        continue-on-error: ${{ matrix.experimental }}
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api_level }}
@@ -115,28 +117,6 @@ jobs:
           script: |
             bash .github/scripts/check-avd-target.sh 'android-${{ matrix.api_level }}' "$ANDROID_AVD_HOME/test.ini"
             bash .github/scripts/run-ui-tests.sh
-
-      - name: 非必須ジョブの失敗を警告として残す
-        if: matrix.experimental && steps.ui-tests.outcome == 'failure'
-        run: |
-          echo "::warning title=API ${{ matrix.api_level }} の UI テストが失敗::非必須ジョブのため CI は落としていません。既知の問題で、原因と戻す条件は #101 を参照してください。診断は artifact の ui-test-diagnostics にあります。"
-          {
-            echo "### :warning: API ${{ matrix.api_level }} の UI テストが失敗（非必須）"
-            echo ""
-            echo "Linux CI の API 37 エミュレータは既知の問題で不安定です。原因と戻す条件は #101 を参照。"
-            echo "このジョブが緑になったら、API 37 を必須にできるか #101 で判断してください。"
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      # continue-on-error により、非必須ジョブはテストが失敗してもジョブ自体は成功になる。
-      # 緑かどうかはジョブの結果ではなく、テストステップの outcome で判定する。
-      - name: API 37 が緑になったことを #101 に通知
-        if: github.event_name == 'schedule' && matrix.experimental && steps.ui-tests.outcome == 'success'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          ISSUE: '101'
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: bash .github/scripts/notify-api37-green.sh
 
       - uses: actions/upload-artifact@v7
         if: always()
