@@ -7,6 +7,10 @@
 
 ## [Unreleased]
 
+### 変更
+- Android UI テスト CI の API 37.0 を必須化。複数回の実成功が確認されたため、暫定運用のローカル検証スクリプト（`scripts/run-ui-tests-local.ps1`）を廃止 (#101)
+- 週次 UI テスト CI でランナー標準の Command-line Tools バージョンを検査し、22.0 以上への更新を自己検知して #127 に通知するスクリプトを追加 (#127)
+
 ### ドキュメント
 - API 37 CI 調査資料に上流 runner-images の Command-line Tools 22.0 更新 PR（#14676）のリンクを追加 (#127)
 
