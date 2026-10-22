@@ -114,6 +114,7 @@ API 37 の非必須設定とローカル検証の暫定運用は維持する。�
 ## 参考資料
 
 - [runner-images #14484](https://github.com/actions/runner-images/issues/14484): 同じ Major.Minor の解析問題の報告。仮説の手がかりに使い、上記ローカル比較で検証した。
+- [runner-images #14676](https://github.com/actions/runner-images/pull/14676): Ubuntu/Windows 向けに Command-line Tools を 22.0 へ更新する上流 PR。マージとランナーイメージ展開がワークアラウンド解消の指標となる（#127）。
 - [AOSP gfxstream RenderControl.cpp](https://android.googlesource.com/platform/hardware/google/gfxstream/+/refs/heads/main/host/RenderControl.cpp): read-color-buffer DMA の広告条件は GlDirectMem と HasSharedSlotsHostMemoryAllocator の両方。
 - [AOSP emulator main.cpp](https://android.googlesource.com/platform/external/qemu/+/emu-master-dev/android-qemu2-glue/main.cpp): API レベルによる機能設定。今回の観測は実行バイナリの verbose ログでも確認した。
 
