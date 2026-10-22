@@ -6,11 +6,12 @@ SCRIPT="$(cd "$(dirname "$0")/.." && pwd)/check-runner-cmdline-tools.sh"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-# スタブ gh: issue view は STUB_LAST_BODY に従い、issue comment は本文を記録する。
+# スタブ gh: issue view は STUB_LAST_BODY / STUB_VIEW_FAIL に従い、issue comment は本文を記録する。
 cat >"$WORK/gh" <<'STUB'
 #!/usr/bin/env bash
 case "$1 $2" in
   "issue view")
+    [ "${STUB_VIEW_FAIL:-}" = "1" ] && { echo "view failed" >&2; exit 1; }
     printf '%s' "${STUB_LAST_BODY:-}"
     ;;
   "issue comment")
@@ -33,20 +34,21 @@ EOF
   echo "$file"
 }
 
-# 名前 | バージョン | イベント名 | 直前コメント | 期待する終了コード | 投稿されるか
+# 名前 | バージョン | イベント名 | 直前コメント | view失敗フラグ | 期待する終了コード | 投稿されるか
 cases=(
-  "ファイル不在||schedule||0|no"
-  "12.0（更新なし）|12.0|schedule||0|no"
-  "19.0（更新なし）|19.0|schedule||0|no"
-  "20.0（22.0未満）|20.0|schedule||0|no"
-  "22.0（更新検知・schedule）|22.0|schedule||0|yes"
-  "23.0（更新検知・schedule）|23.0|schedule||0|yes"
-  "22.0だがPRイベント|22.0|pull_request||0|no"
-  "22.0だが直前が同じ通知|22.0|schedule|<!-- runner-cmdline-tools-updated -->前回の通知|0|no"
+  "ファイル不在||schedule|||0|no"
+  "12.0（更新なし）|12.0|schedule|||0|no"
+  "19.0（更新なし）|19.0|schedule|||0|no"
+  "20.0（22.0未満）|20.0|schedule|||0|no"
+  "22.0（更新検知・schedule）|22.0|schedule|||0|yes"
+  "23.0（更新検知・schedule）|23.0|schedule|||0|yes"
+  "22.0だがPRイベント|22.0|pull_request|||0|no"
+  "22.0だが直前が同じ通知|22.0|schedule|<!-- runner-cmdline-tools-updated -->前回の通知||0|no"
+  "コメント取得失敗|22.0|schedule||1|1|no"
 )
 
 for entry in "${cases[@]}"; do
-  IFS='|' read -r name ver event last want_exit want_post <<<"$entry"
+  IFS='|' read -r name ver event last fail want_exit want_post <<<"$entry"
   rm -f "$WORK/posted" "$WORK/source.properties"
   status=0
   props_path="$WORK/nonexistent.properties"
@@ -55,7 +57,7 @@ for entry in "${cases[@]}"; do
   fi
 
   GH_BIN="$WORK/gh" ISSUE=127 RUN_URL="https://example.test/run/100" \
-    GITHUB_EVENT_NAME="$event" STUB_LAST_BODY="$last" STUB_POSTED="$WORK/posted" \
+    GITHUB_EVENT_NAME="$event" STUB_LAST_BODY="$last" STUB_VIEW_FAIL="$fail" STUB_POSTED="$WORK/posted" \
     bash "$SCRIPT" "$props_path" >/dev/null 2>&1 || status=$?
 
   posted=no

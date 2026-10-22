@@ -63,7 +63,7 @@ if ! command -v "$GH_BIN" >/dev/null 2>&1; then
   exit 0
 fi
 
-last_body="$("$GH_BIN" issue view "$ISSUE" --json comments --jq '.comments | last | .body // ""' 2>/dev/null || echo "")"
+last_body="$("$GH_BIN" issue view "$ISSUE" --json comments --jq '.comments | last | .body // ""')"
 if [[ "$last_body" == *"$MARKER"* ]]; then
   echo "直前のコメントが同じ更新通知のため投稿しない"
   exit 0
