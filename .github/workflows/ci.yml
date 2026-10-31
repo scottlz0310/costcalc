@@ -150,17 +150,34 @@ jobs:
           test -s "$RUNNER_TEMP/proguard.map"
           cmp app/build/outputs/mapping/release/mapping.txt "$RUNNER_TEMP/proguard.map"
 
-      # 他の prebuilt はシンボル削除済み。抽出可能な DataStore の全 ABI を検証する。
+      # prebuilt ライブラリから抽出されたシンボル表が存在する場合に、AAB 同梱と一致を検証する。
+      # 配布元ですでに strip 済みのライブラリ（DataStore 1.3.0 以降や CameraX、ML Kit 等）からは
+      # シンボル表が生成されないため、抽出対象が存在する場合のみ照合する。
       - name: ネイティブシンボル表の同梱を検証
         run: |
           aab=app/build/outputs/bundle/release/app-release.aab
+          symbols_dir="app/build/intermediates/native_symbol_tables/release/extractReleaseNativeSymbolTables/out"
+          verified_count=0
           for abi in arm64-v8a armeabi-v7a x86 x86_64; do
-            symbols="$RUNNER_TEMP/libdatastore_shared_counter-$abi.so.sym"
-            unzip -p "$aab" "BUNDLE-METADATA/com.android.tools.build.debugsymbols/$abi/libdatastore_shared_counter.so.sym" > "$symbols"
-            test -s "$symbols"
-            readelf --section-headers "$symbols" | grep -F '.symtab'
-            cmp "app/build/intermediates/native_symbol_tables/release/extractReleaseNativeSymbolTables/out/$abi/libdatastore_shared_counter.so.sym" "$symbols"
+            if [ -d "$symbols_dir/$abi" ]; then
+              for sym_file in "$symbols_dir/$abi"/*.sym; do
+                if [ -f "$sym_file" ]; then
+                  filename="$(basename "$sym_file")"
+                  symbols="$RUNNER_TEMP/$abi-$filename"
+                  unzip -p "$aab" "BUNDLE-METADATA/com.android.tools.build.debugsymbols/$abi/$filename" > "$symbols"
+                  test -s "$symbols"
+                  readelf --section-headers "$symbols" | grep -F '.symtab'
+                  cmp "$sym_file" "$symbols"
+                  verified_count=$((verified_count + 1))
+                fi
+              done
+            fi
           done
+          if [ "$verified_count" -gt 0 ]; then
+            echo "抽出されたネイティブシンボル表 $verified_count 件を検証しました。"
+          else
+            echo "抽出対象のネイティブシンボル（.symtab を保持する prebuilt ライブラリ）はありませんでした。"
+          fi
 
   ktlint:
     name: ktlint
