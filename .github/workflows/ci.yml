@@ -151,13 +151,14 @@ jobs:
           cmp app/build/outputs/mapping/release/mapping.txt "$RUNNER_TEMP/proguard.map"
 
       # prebuilt ライブラリから抽出されたシンボル表が存在する場合に、AAB 同梱と一致を検証する。
-      # 配布元ですでに strip 済みのライブラリ（DataStore 1.3.0 以降や CameraX、ML Kit 等）からは
-      # シンボル表が生成されないため、抽出対象が存在する場合のみ照合する。
+      # 配布元で strip 済みのライブラリ（DataStore 1.3.0 以降等）では一部 ABI で .symtab なしの
+      # シンボル表が生成されるか抽出がスキップされるため、生成された成果物の一致を検証する。
       - name: ネイティブシンボル表の同梱を検証
         run: |
           aab=app/build/outputs/bundle/release/app-release.aab
           symbols_dir="app/build/intermediates/native_symbol_tables/release/extractReleaseNativeSymbolTables/out"
           verified_count=0
+          symtab_count=0
           for abi in arm64-v8a armeabi-v7a x86 x86_64; do
             if [ -d "$symbols_dir/$abi" ]; then
               for sym_file in "$symbols_dir/$abi"/*.sym; do
@@ -166,18 +167,16 @@ jobs:
                   symbols="$RUNNER_TEMP/$abi-$filename"
                   unzip -p "$aab" "BUNDLE-METADATA/com.android.tools.build.debugsymbols/$abi/$filename" > "$symbols"
                   test -s "$symbols"
-                  readelf --section-headers "$symbols" | grep -F '.symtab'
                   cmp "$sym_file" "$symbols"
+                  if readelf --section-headers "$symbols" | grep -F -q '.symtab'; then
+                    symtab_count=$((symtab_count + 1))
+                  fi
                   verified_count=$((verified_count + 1))
                 fi
               done
             fi
           done
-          if [ "$verified_count" -gt 0 ]; then
-            echo "抽出されたネイティブシンボル表 $verified_count 件を検証しました。"
-          else
-            echo "抽出対象のネイティブシンボル（.symtab を保持する prebuilt ライブラリ）はありませんでした。"
-          fi
+          echo "同梱シンボル表: $verified_count 件検証（うち .symtab 保持: $symtab_count 件）"
 
   ktlint:
     name: ktlint

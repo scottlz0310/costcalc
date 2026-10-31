@@ -73,7 +73,7 @@ Release の `ndk.debugSymbolLevel = "SYMBOL_TABLE"` で、抽出可能な関数�
 
 | ライブラリ | 依存元 | 配布時のシンボル表 |
 |---|---|---|
-| `libdatastore_shared_counter.so` | DataStore 1.2.1: 4 ABI とも `.symtab` あり<br>DataStore 1.3.0 以降: 削除済み | バージョン依存 |
+| `libdatastore_shared_counter.so` | DataStore 1.2.1: 4 ABI とも `.symtab` あり<br>DataStore 1.3.0 以降: 削除済み（arm64-v8a は未抽出、他 3 ABI は `.symtab` なしで抽出） | バージョン依存 |
 | `libandroidx.graphics.path.so` | graphics-path 1.0.1 | 削除済み |
 | `libimage_processing_util_jni.so` / `libsurface_util_jni.so` | CameraX 1.6.2 | 削除済み |
 | `libmlkit_google_ocr_pipeline.so` | text-recognition-bundled-common 17.0.0 | 削除済み |
@@ -97,8 +97,10 @@ SDK ライセンスの同意が必要で、取得に失敗した場合はビル�
 ```
 
 PR の CI は prebuilt ライブラリから抽出されたシンボル表が存在する場合に、
-AAB 内の `.so.sym` が空でないこと、`.symtab` を持つこと、AGP の抽出ファイルと一致することを動的に検証する。
-DataStore 1.3.0 以降のようにすべての依存先 prebuilt がシンボル削除済みの場合は抽出対象 0 件として記録・成功する。
+AAB 内の `.so.sym` が空でないこと、AGP の抽出ファイルと一致することを動的に検証する。
+DataStore 1.3.0 のように配布元でシンボルが削除されたライブラリでは、arm64-v8a は抽出がスキップされ、
+他 3 ABI は `.symtab` を持たないシンボル表が生成される。CI は生成された成果物の一致を検証し、
+`.symtab` を保持する件数を集計して記録する。
 シンボルは AAB 内に保持し、別の公開アセットやダミーのシンボルファイルは作成しない。
 
 Play Console の警告が完全に消えるかは次回入稿時に確認する。
