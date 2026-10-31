@@ -73,7 +73,7 @@ Release の `ndk.debugSymbolLevel = "SYMBOL_TABLE"` で、抽出可能な関数�
 
 | ライブラリ | 依存元 | 配布時のシンボル表 |
 |---|---|---|
-| `libdatastore_shared_counter.so` | DataStore 1.2.1 | 4 ABI とも `.symtab` あり |
+| `libdatastore_shared_counter.so` | DataStore 1.2.1: 4 ABI とも `.symtab` あり<br>DataStore 1.3.0 以降: 削除済み | バージョン依存 |
 | `libandroidx.graphics.path.so` | graphics-path 1.0.1 | 削除済み |
 | `libimage_processing_util_jni.so` / `libsurface_util_jni.so` | CameraX 1.6.2 | 削除済み |
 | `libmlkit_google_ocr_pipeline.so` | text-recognition-bundled-common 17.0.0 | 削除済み |
@@ -96,9 +96,9 @@ SDK ライセンスの同意が必要で、取得に失敗した場合はビル�
 & "$env:ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager.bat" 'ndk;28.2.13676358'
 ```
 
-PR の CI は DataStore の4 ABI分について、AAB 内の `.so.sym` が空でないこと、
-`.symtab` を持つこと、AGP の抽出ファイルと一致することを検証する。
-他の16本は依存元ですでにシンボル削除済みのため、同梱を要求しない。
+PR の CI は prebuilt ライブラリから抽出されたシンボル表が存在する場合に、
+AAB 内の `.so.sym` が空でないこと、`.symtab` を持つこと、AGP の抽出ファイルと一致することを動的に検証する。
+DataStore 1.3.0 以降のようにすべての依存先 prebuilt がシンボル削除済みの場合は抽出対象 0 件として記録・成功する。
 シンボルは AAB 内に保持し、別の公開アセットやダミーのシンボルファイルは作成しない。
 
 Play Console の警告が完全に消えるかは次回入稿時に確認する。
@@ -143,3 +143,23 @@ API 37 のエミュレータに最適化済み Release APK を入れ、以下を
 
 ユニットテスト42件・Android Lint、および CI に追加した未署名 AAB のビルド／メタデータ検証も成功した。
 Play Console への入稿・警告解消の確認は次回リリース時に行う。
+
+## エッジ ツー エッジ指摘の調査と許容根拠（#135）
+
+Play Console の「次のリリースに向けて」に表示されるエッジ ツー エッジ指摘2件（v1.3.1・v1.3.2 継続）について調査し、アプリ側での解消が困難または確実な対処手段がないため「許容（not planned）」としてクローズした。
+
+### 指摘 2: 「エッジ ツー エッジで非推奨の API またはパラメータを使用しています」
+- **原因確定**: AAB の `proguard.map` による難読化逆引きの結果、呼び出し元は `androidx.activity` の `EdgeToEdgeApi26` / `29` / `35`（`enableEdgeToEdge()` の内部実装）および `adjustLayoutInDisplayCutoutMode`（`AccessibilityNodeInfoCompat$$ExternalSyntheticApiModelOutline0`）。
+- **アプリ側コードの状況**: アプリ側コードに `setStatusBarColor` 等の非推奨 API の直接呼び出しは存在しない（ライブラリ起因）。
+- **許容の根拠**: `androidx.activity` ライブラリ自身が `@Suppress("DEPRECATION")` 付きで `statusBarColor` / `navigationBarColor` / `SHORT_EDGES` を設定しており、Android 11〜14 においては非推奨でない代替 API が存在しない。自前実装に置き換えても同等の警告となり、`enableEdgeToEdge()` を除外することは #120（システムバー背後への描画）の回帰となるため、現状のまま許容する。
+
+### 指摘 1: 「一部のユーザーでエッジ ツー エッジ表示が有効にならないことがあります」
+- **原因調査状況**: 原因未確定。`enableEdgeToEdge()` は `MainActivity.onCreate` の `setContent` 前に呼び出しており、呼び出し順や配置は原因ではない。
+- **有力仮説**: マージ済みマニフェストに含まれる `GoogleApiActivity`（`Theme.Translucent.NoTitleBar`、play-services-base 由来）など、外部依存ライブラリの透明 Activity が原因である可能性（他プロジェクトでも類似の報告あり）。
+- **許容の根拠**: Play Console は原因となる具体的な Activity を表示しないため確定が困難であり、`tools:node="remove"` によるライブラリ Activity の除外は Play services の動作を損なう恐れがある。確実な対処手段がないため許容する。
+
+### 再確認の契機
+以下のいずれかの変化があった際に再確認する：
+1. `androidx.activity` の新しい安定版リリース（`enableEdgeToEdge` の実装変更時）
+2. `play-services-base` または ML Kit の更新
+3. 次回以降のリリース入稿後の Play Console 表示の変化
